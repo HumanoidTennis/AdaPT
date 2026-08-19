@@ -31,6 +31,28 @@
   gap: 0;
 }
 
+.omni-hero-grid--single .hero-bg-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.omni-hero-grid--single .grid-cell video {
+  position: relative;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.omni-hero-grid--single .grid-cell.is-video-ready video {
+  opacity: 1;
+}
+
 .omni-hero-grid--single .grid-cell:hover video {
   transform: none;
 }

@@ -22,13 +22,13 @@
 
   <link rel="stylesheet" href="static/css/bulma.min.css?v=omni-20260602-generalization-tabs">
   <link rel="stylesheet" href="static/css/index.css?v=adapt-tennis-sky-20260817">
-  <link rel="stylesheet" href="static/css/omnicontact.css?v=adapt-hvr-browser-wide-20260818">
+  <link rel="stylesheet" href="static/css/omnicontact.css?v=adapt-hero-poster-20260819">
   <script>
     if (location.protocol === 'file:') document.documentElement.classList.add('is-file-protocol');
   </script>
 
   <script defer src="static/js/fontawesome.all.min.js?v=omni-20260602-generalization-tabs"></script>
-  <script defer src="static/js/index.js?v=omni-20260605-global-video-mute"></script>
+  <script defer src="static/js/index.js?v=adapt-hero-poster-20260819"></script>
   <script type="importmap">
   {
     "imports": {
@@ -146,7 +146,8 @@
     <section class="hero hero-main omni-hero" id="top-section">
       <div class="hero-video-grid omni-hero-grid omni-hero-grid--single" aria-hidden="true">
         <div class="grid-cell">
-          <video autoplay muted loop playsinline preload="metadata">
+          <img class="hero-bg-poster" src="static/videos/adapt/background_demo/bg_demo.jpg" alt="" decoding="async" fetchpriority="high">
+          <video autoplay muted loop playsinline preload="auto" poster="static/videos/adapt/background_demo/bg_demo.jpg">
             <source src="static/videos/adapt/background_demo/bg_demo.mp4" type="video/mp4">
           </video>
         </div>

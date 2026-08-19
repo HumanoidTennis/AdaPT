@@ -1182,8 +1182,26 @@ function setupVideoGlow() {
     wraps.forEach(function(wrap) { observer.observe(wrap); });
 }
 
+function setupHeroBackgroundVideo() {
+    var cell = document.querySelector('.omni-hero-grid--single .grid-cell');
+    var video = cell && cell.querySelector('video');
+    if (!cell || !video) return;
+
+    function markReady() {
+        cell.classList.add('is-video-ready');
+    }
+
+    if (video.readyState >= 3 && !video.paused) {
+        markReady();
+        return;
+    }
+
+    video.addEventListener('playing', markReady, { once: true });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     setupGlobalVideoMute();
+    setupHeroBackgroundVideo();
 
     var options = {
         slidesToScroll: 1,
