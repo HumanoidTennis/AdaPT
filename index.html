@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="title" content="AdaPT: Towards Professional Tennis Styles for Humanoid Robots with Adaptive Motion Planning and Tracking">
+  <meta name="description" content="AdaPT jointly models motion planning and tracking with explicit speed adaptation, bringing professional tennis styles to a Unitree G1 humanoid for both rally and serving.">
+  <meta name="keywords" content="humanoid for sports, motion tracking, motion planning, reinforcement learning">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="AdaPT">
+  <meta property="og:title" content="AdaPT: Towards Professional Tennis Styles for Humanoid Robots with Adaptive Motion Planning and Tracking">
+  <meta property="og:description" content="AdaPT jointly models motion planning and tracking with explicit speed adaptation, bringing professional tennis styles to a Unitree G1 humanoid for both rally and serving.">
+  <meta property="og:image" content="static/images/omnicontact-overview.svg">
+
+  <meta name="theme-color" content="#050506">
+
+  <title>AdaPT: Towards Professional Tennis Styles for Humanoid Robots with Adaptive Motion Planning and Tracking</title>
+
+  <link rel="stylesheet" href="static/css/bulma.min.css?v=omni-20260602-generalization-tabs">
+  <link rel="stylesheet" href="static/css/index.css?v=adapt-tennis-sky-20260817">
+  <link rel="stylesheet" href="static/css/omnicontact.css?v=adapt-hvr-browser-wide-20260818">
+  <script>
+    if (location.protocol === 'file:') document.documentElement.classList.add('is-file-protocol');
+  </script>
+
+  <script defer src="static/js/fontawesome.all.min.js?v=omni-20260602-generalization-tabs"></script>
+  <script defer src="static/js/index.js?v=omni-20260605-global-video-mute"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./static/vendor/three/build/three.module.js",
+      "three/addons/": "./static/vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="static/js/dataset-glb-previews.js?v=adapt-glb-preview-light-20260818"></script>
+</head>
+<body>
+  <script>
+    (function() {
+      try {
+        if (localStorage.getItem('omni-theme') === 'dark') {
+          document.body.classList.add('omni-dark');
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <script>
+    (function() {
+      if (window.location.protocol !== 'file:') return;
+      try {
+        if (sessionStorage.getItem('omni-file-open-notice') === 'seen') return;
+        sessionStorage.setItem('omni-file-open-notice', 'seen');
+      } catch (error) {}
+      window.addEventListener('load', function() {
+        window.setTimeout(function() {
+          var overlay = document.createElement('div');
+          overlay.setAttribute('role', 'dialog');
+          overlay.setAttribute('aria-modal', 'true');
+          overlay.setAttribute('aria-label', 'Local file viewing notice');
+          overlay.style.cssText = [
+            'position:fixed',
+            'inset:0',
+            'z-index:99999',
+            'display:flex',
+            'align-items:center',
+            'justify-content:center',
+            'padding:1.25rem',
+            'background:rgba(5,5,6,0.56)'
+          ].join(';');
+
+          var dialog = document.createElement('div');
+          dialog.style.cssText = [
+            'width:min(92vw,560px)',
+            'border-radius:8px',
+            'background:#fff',
+            'color:#111827',
+            'box-shadow:0 24px 80px rgba(0,0,0,0.34)',
+            'font-family:Arial,sans-serif',
+            'line-height:1.5',
+            'padding:1.2rem 1.35rem'
+          ].join(';');
+
+          dialog.innerHTML =
+            '<h2 style="margin:0 0 0.65rem;font-size:1.05rem;font-weight:800;">Local HTML Notice</h2>' +
+            '<p style="margin:0 0 0.75rem;">You are opening AdaPT from a local HTML file.</p>' +
+            '<p style="margin:0 0 0.75rem;">Most images and videos should work directly. If any interactive viewer, iframe, or asset does not display, please run this command in the project folder:</p>' +
+            '<p style="margin:0 0 0.75rem;"><code style="color:#d11212;font-weight:900;font-size:1.02rem;">python -m http.server 8765</code></p>' +
+            '<p style="margin:0 0 0.75rem;">Then open <code>http://localhost:8765/index.html</code>.</p>' +
+            '<p style="margin:0 0 1rem;">You can also inspect videos directly under <code>static/videos/omnicontact/</code>.</p>' +
+            '<button type="button" style="display:inline-flex;align-items:center;justify-content:center;min-height:2.2rem;padding:0 0.95rem;border:0;border-radius:6px;background:#111827;color:#fff;font-weight:800;cursor:pointer;">OK</button>';
+
+          overlay.appendChild(dialog);
+          document.body.appendChild(overlay);
+
+          var closeButton = dialog.querySelector('button');
+          function closeNotice() {
+            overlay.remove();
+          }
+          closeButton.addEventListener('click', closeNotice);
+          overlay.addEventListener('click', function(event) {
+            if (event.target === overlay) closeNotice();
+          });
+          document.addEventListener('keydown', function onKeydown(event) {
+            if (event.key !== 'Escape') return;
+            document.removeEventListener('keydown', onKeydown);
+            closeNotice();
+          });
+          closeButton.focus();
+        }, 450);
+      });
+    })();
+  </script>
+  <button type="button" class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <div class="more-works-container">
+    <!-- <button type="button" class="theme-toggle" data-theme-toggle title="Switch color mode" aria-label="Switch to dark mode">
+      <i class="fas fa-moon" aria-hidden="true"></i>
+    </button> -->
+    <aside class="outline-panel" aria-label="Page outline">
+      <div class="outline-panel-title" id="outline-toggle">
+        <i class="fas fa-list-ul"></i>
+        <span>Outline</span>
+        <svg class="outline-fold-icon" viewBox="0 0 16 16" width="12" height="12"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="outline-links" id="outline-links">
+        <a href="#top-section" class="outline-link active" data-outline-link="top-section">Top</a>
+        <a href="#overview-section" class="outline-link" data-outline-link="overview-section">Overview</a>
+        <a href="#rally-section" class="outline-link" data-outline-link="rally-section">Tennis Rally</a>
+        <a href="#serving-section" class="outline-link" data-outline-link="serving-section">Tennis Serve</a>
+        <a href="#human-vs-robot-section" class="outline-link" data-outline-link="human-vs-robot-section">Human vs. Robot</a>
+        <a href="#dataset-section" class="outline-link" data-outline-link="dataset-section">Dataset</a>
+        <a href="#comparison-section" class="outline-link" data-outline-link="comparison-section">Baselines</a>
+        <a href="#citation-section" class="outline-link" data-outline-link="citation-section">Citation</a>
+      </div>
+    </aside>
+  </div>
+
+  <main id="main-content">
+    <section class="hero hero-main omni-hero" id="top-section">
+      <div class="hero-video-grid omni-hero-grid omni-hero-grid--single" aria-hidden="true">
+        <div class="grid-cell">
+          <video autoplay muted loop playsinline preload="metadata">
+            <source src="static/videos/adapt/background_demo/bg_demo.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+      <div class="hero-main-overlay" aria-hidden="true"></div>
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered hero-main-content">
+              <h1 class="title is-1 publication-title hero-stagger hero-stagger--1">
+                <span class="title-main">AdaPT</span>
+                <span class="title-sub">Towards Professional Tennis Styles for Humanoid Robots<br>with Adaptive Motion Planning and Tracking</span>
+              </h1>
+              <div class="publication-authors publication-authors--dense hero-stagger hero-stagger--2" aria-label="Authors">
+                <span class="author-block"><a href="https://taohuang13.github.io/" target="_blank" rel="noopener noreferrer">Tao Huang</a><sup>1,2,4,*,&Dagger;</sup></span>
+                <span class="author-block"><a href="https://github.com/lrf23" target="_blank" rel="noopener noreferrer">Ruofei Liu</a><sup>1,4,*</sup></span>
+                <span class="author-block"><a href="https://github.com/tangxch" target="_blank" rel="noopener noreferrer">Xuchen Tang</a><sup>1</sup></span>
+                <span class="author-block"><a href="https://github.com/audu-123" target="_blank" rel="noopener noreferrer">Xinyin Zhang</a><sup>1</sup></span>
+                <span class="author-block"><a href="https://renjunli99.github.io/" target="_blank" rel="noopener noreferrer">Junli Ren</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://why618188.github.io/" target="_blank" rel="noopener noreferrer">Huayi Wang</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://trap-1.github.io/" target="_blank" rel="noopener noreferrer">Feiyu Jia</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://www.linkedin.com/in/yukaiqi" target="_blank" rel="noopener noreferrer">Yukai Qi</a><sup>1</sup></span>
+                <span class="author-block"><a href="https://yinkangning0124.github.io/" target="_blank" rel="noopener noreferrer">Kangning Yin</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://zengweishuai.github.io/" target="_blank" rel="noopener noreferrer">Weishuai Zeng</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://lipeng-chen.github.io/" target="_blank" rel="noopener noreferrer">Lipeng Chen</a><sup>4</sup></span>
+                <span class="author-block"><a href="">Xi Li</a><sup>3</sup></span>
+                <span class="author-block"><a href="">Ting Wu</a><sup>1</sup></span>
+                <span class="author-block"><a href="https://kailinli.top/" target="_blank" rel="noopener noreferrer">Kailin Li</a><sup>2</sup></span>
+                <span class="author-block"><a href="https://cn.linkedin.com/in/tristan-ruoli-dai-b2369330" target="_blank" rel="noopener noreferrer">Ruoli Dai</a><sup>1</sup></span>
+                <span class="author-block"><a href="https://wangjingbo1219.github.io/" target="_blank" rel="noopener noreferrer">Jingbo Wang</a><sup>2,&dagger;</sup></span>
+                <span class="author-block"><a href="https://leihan.org/" target="_blank" rel="noopener noreferrer">Lei Han</a><sup>1,&dagger;,&Dagger;</sup></span>
+                <span class="author-block"><a href="https://oceanpang.github.io/" target="_blank" rel="noopener noreferrer">Jiangmiao Pang</a><sup>2,&dagger;</sup></span>
+              </div>
+              <div class="affiliations-wrap hero-stagger hero-stagger--3">
+                <button type="button" class="affiliations-toggle" aria-expanded="false" aria-controls="affiliations-body">
+                  <span>Affiliations</span>
+                  <span class="affiliations-arrow" aria-hidden="true">▼</span>
+                </button>
+                <p class="affiliations-body" id="affiliations-body">
+                  <sup>1</sup> Noitom Robotics&nbsp;&nbsp;&nbsp;
+                  <sup>2</sup> Shanghai AI Laboratory&nbsp;&nbsp;&nbsp;
+                  <sup>3</sup> Dobot Robotics&nbsp;&nbsp;&nbsp;
+                  <sup>4</sup> Shanghai Jiao Tong University
+                </p>
+                <p class="eql-cntrb">
+                  <sup>*</sup> Equal Contribution&nbsp;&nbsp;&nbsp;
+                  <sup>&dagger;</sup> Equal Advising&nbsp;&nbsp;&nbsp;
+                  <sup>&Dagger;</sup> Project Lead
+                </p>
+              </div>
+              <div class="demo-desc hero-stagger hero-stagger--4">
+                <h2>We propose AdaPT, an Adaptive motion Planning and Tracking framework<br>that learns professional tennis serving and rally styles.</h2>
+                <p class="hero-highlights">
+                  Tennis Motions from video & Mocap · Rally on G1 & Atom P3 · In-the-wild serving
+                </p>
+                <!-- <p>We propose AdaPT, an Adaptive motion Planning and Tracking framework that learns professional tennis serving and rally styles.</p> -->
+              </div>
+              <div class="publication-links hero-stagger hero-stagger--5">
+                <span class="link-block"><a href="https://github.com/Ingrid789/OmniContact_sim2sim" class="external-link button is-normal is-rounded is-dark" target="_blank" rel="noopener noreferrer"><span class="icon"><i class="fab fa-github"></i></span><span>GitHub Code</span></a></span>
+                <span class="link-block"><a href="https://arxiv.org/abs/2606.26201" class="external-link button is-normal is-rounded is-dark" target="_blank" rel="noopener noreferrer"><span class="icon"><i class="fas fa-file-alt"></i></span><span>arXiv</span></a></span>
+                <span class="link-block"><a href="https://www.youtube.com/watch?v=z6PSvyTsI7U" target="_blank" rel="noopener noreferrer" class="external-link button is-normal is-rounded is-dark"><span class="icon"><i class="fab fa-youtube"></i></span><span>YouTube</span></a></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero is-light omni-section" id="overview-section">
+      <div class="container overview-container">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Overview <a href="#overview-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <div class="overview-showcase reveal" data-overview-switcher>
+          <div class="dataset-view-tabs overview-view-tabs" role="tablist" aria-label="Overview views">
+            <button type="button" class="dataset-view-tab is-active" data-overview-view="video" aria-selected="true">AdaPT Video</button>
+            <button type="button" class="dataset-view-tab" data-overview-view="framework" aria-selected="false">Framework Image</button>
+          </div>
+          <div class="overview-panel-set">
+            <div class="overview-tab-panel overview-tab-panel--video" data-overview-panel="video" aria-hidden="false">
+              <figure class="overview-video-figure">
+                <iframe
+                  src=""
+                  title="AdaPT: Towards Professional Tennis Styles for Humanoid Robots with Adaptive Motion Planning and Tracking"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                ></iframe>
+              </figure>
+            </div>
+            <div class="overview-tab-panel overview-tab-panel--framework" data-overview-panel="framework" aria-hidden="true" hidden>
+              <figure class="overview-original-figure">
+                <img src="static/images/overview_adapt.png" alt="Overview of OmniContact: CF-Gen synthesizes contact-flow segments and CF-Track executes them with a low-level policy." loading="lazy">
+              </figure>
+              <!-- <figure class="overview-original-figure overview-original-figure--contact-flow">
+                <img src="static/images/overview_contact_flow.png?v=overview-pdf-20260604" alt="Contact-flow examples for carry, push, kick, locomotion, and recovery tasks." loading="lazy">
+              </figure> -->
+              <div class="metric-row">
+                <div class="metric-card"><span>Professional</span><p>Athlete motions</p></div>
+                <div class="metric-card"><span>Full-size</span><p>Humanoid robots</p></div>
+                <div class="metric-card"><span>Multi-rally</span><p>Human vs. robot play</p></div>
+                <div class="metric-card"><span>In the wild</span><p>Real-world serving</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="section hero is-light omni-section" id="rally-section">
+      <div class="container is-max-desktop generalization-container">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Tennis Rally <a href="#rally-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <p class="demo-desc has-text-centered reveal">Rally hitting styles from different players, deployed on Unitree G1 and Atom P3.</p>
+        <div class="generalization-demo reveal" data-generalization-browser>
+          <div class="generalization-tab-row">
+            <div class="generalization-row-label">Player</div>
+            <div class="generalization-tabs generalization-tabs--skills" role="tablist" aria-label="Players">
+              <button type="button" class="generalization-tab is-active" data-generalization-skill="federer" aria-selected="true">Roger Federer</button>
+              <button type="button" class="generalization-tab" data-generalization-skill="nadal" aria-selected="false">Rafael Nadal</button>
+              <button type="button" class="generalization-tab" data-generalization-skill="first_class" aria-selected="false">Tennis Athletes</button>
+              <button type="button" class="generalization-tab" data-generalization-skill="djokovic" aria-selected="false">Novak Djokovic</button>
+            </div>
+          </div>
+          <div class="generalization-tab-row">
+            <div class="generalization-row-label">Robot</div>
+            <div class="generalization-tabs generalization-tabs--secondary" role="tablist" aria-label="Robot platforms">
+              <button type="button" class="generalization-tab is-active" data-generalization-config="g1" aria-selected="true">Unitree G1</button>
+              <button type="button" class="generalization-tab" data-generalization-config="atom_p3">Atom P3</button>
+            </div>
+          </div>
+          <div class="generalization-video-grid generalization-video-grid--multi" data-generalization-videos></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero omni-section" id="serving-section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Tennis Serve <a href="#serving-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <p class="demo-desc has-text-centered reveal">Tennis serving styles from multiple players, validated in both Mocap systems and in-the-wild settings.</p>
+        <div class="recovery-browser reveal" data-chaining-browser>
+          <div class="generalization-tabs recovery-tabs" role="tablist" aria-label="Serve data sources">
+            <button type="button" class="generalization-tab is-active" data-chaining-task="mocap" aria-selected="true">Motions from MoCap</button>
+            <button type="button" class="generalization-tab" data-chaining-task="video" aria-selected="false">Motions from Video</button>
+          </div>
+          <div class="recovery-video-grid" data-chaining-videos></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero is-light omni-section" id="human-vs-robot-section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Human vs. Robot <a href="#human-vs-robot-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <div class="recovery-browser reveal" data-recovery-browser>
+          <div class="generalization-tabs recovery-tabs" role="tablist" aria-label="Human vs. robot demos">
+            <button type="button" class="generalization-tab is-active" data-recovery-task="federer" aria-selected="true">Roger Federer</button>
+            <button type="button" class="generalization-tab" data-recovery-task="tennis_athlete" aria-selected="false">Tennis Athlete</button>
+          </div>
+          <div class="recovery-video-grid" data-recovery-videos></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero omni-section" id="dataset-section">
+      <div class="container is-max-desktop dataset-container">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Dataset <a href="#dataset-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <p class="demo-desc has-text-centered reveal">Video motions are recovered and retargeted using <a href="https://zju3dv.github.io/gvhmr/" target="_blank" rel="noopener noreferrer">GVHMR</a> and <a href="https://github.com/YanjieZe/GMR" target="_blank" rel="noopener noreferrer">GMR</a>. Mocap motions are collected by the <a href="https://noitomrobotics.com/" target="_blank" rel="noopener noreferrer">Noitom Robotics</a> and retargeted using <a href="./">UMR</a> (Unified Motion Retargeting, coming soon).</p>
+        <div class="dataset-showcase reveal">
+          <div class="dataset-primary">
+            <div class="dataset-view-tabs" role="tablist" aria-label="Dataset views">
+              <button type="button" class="dataset-view-tab is-active" data-dataset-view="counts" aria-selected="true">View data volume</button>
+              <button type="button" class="dataset-view-tab" data-dataset-view="motion" aria-selected="false">View dataset motion</button>
+            </div>
+            <div class="dataset-flip-card" data-dataset-flip>
+              <div class="dataset-flip-inner">
+                <div class="dataset-flip-face dataset-flip-front tsne-panel" aria-hidden="false">
+                  <div class="tsne-header">
+                    <div>
+                      <h3>Duration by Motion Style</h3>
+                    </div>
+                  </div>
+                  <div class="dataset-pie-grid" data-stroke-charts></div>
+                </div>
+                <div class="dataset-flip-face dataset-flip-back embedded-viewer embedded-viewer--dataset-cloud" aria-hidden="true">
+                  <div class="embedded-viewer-header">
+                    <div>
+                      <h3>Dataset Motion Browser</h3>
+                    </div>
+                    <div class="dataset-flip-actions">
+                      <a href="dataset_motion_cloud.html?group=dataset_balanced&amp;v=dataset-cloud-7x5-20260818" target="_blank" rel="noopener">Open full page</a>
+                    </div>
+                  </div>
+                  <iframe
+                    data-src="dataset_motion_cloud.html?group=dataset_balanced&amp;embed=1&amp;v=dataset-cloud-7x5-20260818"
+                    title="AdaPT G1 rally and serve GLB sequences in one synchronized 7 by 5 scene"
+                    loading="lazy"
+                    allow="fullscreen; autoplay"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="dataset-side">
+              <div class="stat-card"><span>21.5 h</span><p>Total motion duration</p></div>
+              <div class="stat-card"><span>6</span><p>Athlete styles</p></div>
+              <div class="stat-card"><span>7</span><p>Stroke and serve types</p></div>
+              <div class="stat-card"><span>30/120 Hz</span><p>Capture rate</p></div>
+            </div>
+            <p class="dataset-file-protocol-hint">GLB previews cannot load from <code>file://</code>. In this folder run <code>python -m http.server 8000</code>, then open <a href="http://localhost:8000/">http://localhost:8000/</a>.</p>
+            <div class="dataset-gallery dataset-glb-gallery reveal" data-dataset-glb-gallery>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/forehand.glb">
+                <div class="dataset-glb-stage" aria-label="Forehand preview"></div>
+                <div class="generalization-video-label">Forehand</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/backhand.glb">
+                <div class="dataset-glb-stage" aria-label="Backhand preview"></div>
+                <div class="generalization-video-label">Backhand</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/slice.glb">
+                <div class="dataset-glb-stage" aria-label="Slice preview"></div>
+                <div class="generalization-video-label">Slice</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/drop.glb">
+                <div class="dataset-glb-stage" aria-label="Drop shot preview"></div>
+                <div class="generalization-video-label">Drop</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/volley.glb">
+                <div class="dataset-glb-stage" aria-label="Volley preview"></div>
+                <div class="generalization-video-label">Volley</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/flat_serve.glb">
+                <div class="dataset-glb-stage" aria-label="Flat serve preview"></div>
+                <div class="generalization-video-label">Flat serve</div>
+              </article>
+              <article class="generalization-video-card dataset-video-card dataset-glb-card" data-glb-src="static/glb/preview/topspin_serve.glb">
+                <div class="dataset-glb-stage" aria-label="Topspin serve preview"></div>
+                <div class="generalization-video-label">Topspin serve</div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="section hero is-light omni-section baseline-comparison" id="comparison-section" data-baseline-browser>
+      <div class="container is-max-desktop baseline-container">
+        <h2 class="title is-3 has-text-centered section-heading reveal">Baselines <a href="#comparison-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+        <div class="generalization-tab-row">
+          <div class="generalization-row-label">Player</div>
+          <div class="generalization-tabs generalization-tabs--secondary baseline-tabs" role="tablist" aria-label="Baseline players">
+            <button type="button" class="generalization-tab is-active" data-baseline-player="nadal" aria-selected="true">Rafael Nadal</button>
+            <button type="button" class="generalization-tab" data-baseline-player="federer">Roger Federer</button>
+            <button type="button" class="generalization-tab" data-baseline-player="djokovic">Novak Djokovic</button>
+          </div>
+        </div>
+        <div class="generalization-tab-row">
+          <div class="generalization-row-label">Task</div>
+          <div class="generalization-tabs generalization-tabs--secondary baseline-tabs" role="tablist" aria-label="Baseline tasks">
+            <button type="button" class="generalization-tab is-active" data-baseline-task="stroke" aria-selected="true">Stroke</button>
+            <button type="button" class="generalization-tab" data-baseline-task="serve">Serve</button>
+          </div>
+        </div>
+        <div class="generalization-video-grid baseline-video-grid" data-baseline-videos></div>
+      </div>
+    </section>
+
+    <section class="section hero is-light omni-section" id="citation-section">
+      <div class="container is-max-desktop">
+        <div class="bibtex-header reveal">
+          <h2 class="title is-3 section-heading">Citation <a href="#citation-section" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+          <button type="button" class="copy-bibtex-btn" onclick="copyBibTeX()" aria-label="Copy BibTeX citation">
+            <i class="fas fa-copy" aria-hidden="true"></i>
+            <span class="copy-text">Copy</span>
+          </button>
+        </div>
+        <pre class="reveal"><code id="bibtex-code">@misc{huang2026adapt,
+      title={Towards Professional Tennis Styles for Humanoid Robots with Adaptive Motion Planning and Tracking},
+      author={Tao Huang, Ruofei Liu, Xuchen Tang, Xinyin Zhang, Junli Ren, Huayi Wang, Feiyu Jia, Yukai Qi, Kangning Yin, Weishuai Zeng, Lipeng Chen, Xi Li, Ting Wu, Kailin Li, Ruoli Dai, Jingbo Wang, Lei Han, Jiangmiao Pang},
+      year={2026}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container is-max-desktop">
+      <div class="content has-text-centered">
+        <p>Website template adapted from <a href="https://github.com/OmniContact/omnicontact.github.io" target="_blank" rel="noopener noreferrer">OmniContact</a>.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      var visible = [];
+      var observer = null;
+
+      function escapeSrc(src) {
+        return String(src).replace(/[&<>"']/g, function(char) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+        });
+      }
+
+      function prune() {
+        visible = visible.filter(function(video) {
+          if (video && video.isConnected) return true;
+          if (observer && video) observer.unobserve(video);
+          return false;
+        });
+      }
+
+      function activate(video) {
+        if (video.dataset.lazyActivated === '1') return;
+        var source = video.querySelector('source[data-src]');
+        if (source) {
+          source.src = source.getAttribute('data-src');
+          source.removeAttribute('data-src');
+          video.load();
+        }
+        video.muted = true;
+        video.dataset.lazyActivated = '1';
+      }
+
+      function playVideo(video) {
+        activate(video);
+        var playPromise = video.play();
+        if (playPromise && playPromise.catch) playPromise.catch(function() {});
+      }
+
+      function pauseVideo(video) {
+        if (!video.paused) video.pause();
+      }
+
+      function syncPlayback() {
+        prune();
+        visible.forEach(playVideo);
+      }
+
+      function ensureObserver() {
+        if (observer || !('IntersectionObserver' in window)) return;
+        observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            var video = entry.target;
+            var idx = visible.indexOf(video);
+            if (entry.isIntersecting) {
+              if (idx === -1) visible.push(video);
+            } else {
+              if (idx !== -1) visible.splice(idx, 1);
+              pauseVideo(video);
+            }
+          });
+          syncPlayback();
+        }, { rootMargin: '160px 0px', threshold: 0.15 });
+      }
+
+      window.adaptLazyVideoTag = function(src) {
+        return '<video controls muted loop playsinline preload="none" data-lazy-video>' +
+          '<source data-src="' + escapeSrc(src) + '" type="video/mp4"></video>';
+      };
+
+      window.adaptLazyVideos = {
+        observe: function(root) {
+          prune();
+          var videos = (root || document).querySelectorAll('video[data-lazy-video]');
+          if (!videos.length) return;
+          if (!('IntersectionObserver' in window)) {
+            Array.prototype.forEach.call(videos, playVideo);
+            return;
+          }
+          ensureObserver();
+          Array.prototype.forEach.call(videos, function(video) {
+            observer.observe(video);
+          });
+        }
+      };
+    })();
+
+    (function() {
+      var storageKey = 'omni-theme';
+      var toggle = document.querySelector('[data-theme-toggle]');
+      var themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (!toggle) return;
+
+      function getStoredTheme() {
+        try {
+          return localStorage.getItem(storageKey) === 'dark' ? 'dark' : 'light';
+        } catch (error) {
+          return document.body.classList.contains('omni-dark') ? 'dark' : 'light';
+        }
+      }
+
+      function applyTheme(theme) {
+        var isDark = theme === 'dark';
+        document.body.classList.toggle('omni-dark', isDark);
+        document.documentElement.style.colorScheme = 'dark';
+        if (themeMeta) {
+          themeMeta.setAttribute('content', '#050506');
+        }
+        toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        toggle.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        toggle.innerHTML = '<i class="fas ' + (isDark ? 'fa-sun' : 'fa-moon') + '" aria-hidden="true"></i>';
+        try {
+          localStorage.setItem(storageKey, theme);
+        } catch (error) {}
+        window.dispatchEvent(new Event('resize'));
+      }
+
+      applyTheme(getStoredTheme());
+      toggle.addEventListener('click', function() {
+        applyTheme(document.body.classList.contains('omni-dark') ? 'light' : 'dark');
+      });
+    })();
+
+	    (function() {
+	      function loadIframe(iframe, stage, placeholder) {
+	        if (!iframe.getAttribute('src')) {
+	          iframe.setAttribute('src', iframe.getAttribute('data-src'));
+	        }
+	        if (stage) {
+	          stage.classList.add('is-loading');
+	        }
+	        if (placeholder) {
+	          placeholder.setAttribute('aria-hidden', 'true');
+	        }
+	      }
+
+	      document.querySelectorAll('[data-policy-viewer-stage]').forEach(function(stage) {
+	        var iframe = stage.querySelector('iframe[data-src]');
+	        var placeholder = stage.querySelector('[data-policy-viewer-placeholder]');
+	        var button = stage.querySelector('[data-policy-viewer-load]');
+	        if (!iframe || !button) return;
+
+	        button.addEventListener('click', function() {
+	          loadIframe(iframe, stage, placeholder);
+	        }, { once: true });
+	      });
+
+	      document.querySelectorAll('[data-embedded-viewer-stage]').forEach(function(stage) {
+	        var iframe = stage.querySelector('iframe[data-src]');
+	        var placeholder = stage.querySelector('[data-embedded-viewer-placeholder]');
+	        var button = stage.querySelector('[data-embedded-viewer-load]');
+	        if (!iframe || !button) return;
+
+	        button.addEventListener('click', function() {
+	          loadIframe(iframe, stage, placeholder);
+	        }, { once: true });
+	      });
+	    })();
+
+    (function() {
+      document.querySelectorAll('[data-overview-switcher]').forEach(function(root) {
+        var tabs = root.querySelectorAll('[data-overview-view]');
+        var videoPanel = root.querySelector('[data-overview-panel="video"]');
+        var frameworkPanel = root.querySelector('[data-overview-panel="framework"]');
+
+        function setView(view) {
+          var showVideo = view === 'video';
+          if (videoPanel) {
+            videoPanel.hidden = !showVideo;
+            videoPanel.setAttribute('aria-hidden', showVideo ? 'false' : 'true');
+          }
+          if (frameworkPanel) {
+            frameworkPanel.hidden = showVideo;
+            frameworkPanel.setAttribute('aria-hidden', showVideo ? 'true' : 'false');
+          }
+          tabs.forEach(function(tab) {
+            var isActive = tab.getAttribute('data-overview-view') === view;
+            tab.classList.toggle('is-active', isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+        }
+
+        tabs.forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            setView(tab.getAttribute('data-overview-view'));
+          });
+        });
+
+        setView('video');
+      });
+    })();
+
+    (function() {
+      document.querySelectorAll('[data-dataset-flip]').forEach(function(card) {
+        var root = card.closest('.dataset-primary') || document;
+	        var tabs = root.querySelectorAll('[data-dataset-view]');
+	        var front = card.querySelector('.dataset-flip-front');
+	        var back = card.querySelector('.dataset-flip-back');
+	        var motionIframe = back ? back.querySelector('iframe[data-src]') : null;
+
+	        function setView(view) {
+	          var isMotion = view === 'motion';
+	          if (isMotion && motionIframe && !motionIframe.getAttribute('src')) {
+	            motionIframe.setAttribute('src', motionIframe.getAttribute('data-src'));
+	          }
+	          card.classList.toggle('is-flipped', isMotion);
+          if (front) {
+            front.setAttribute('aria-hidden', isMotion ? 'true' : 'false');
+          }
+          if (back) {
+            back.setAttribute('aria-hidden', isMotion ? 'false' : 'true');
+          }
+          tabs.forEach(function(tab) {
+            var isActive = tab.getAttribute('data-dataset-view') === view;
+            tab.classList.toggle('is-active', isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+        }
+
+        tabs.forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            setView(tab.getAttribute('data-dataset-view'));
+          });
+        });
+
+        setView('counts');
+      });
+    })();
+
+    (function() {
+      var root = document.querySelector('[data-stroke-charts]');
+      if (!root) return;
+
+      var strokes = [
+        { key: 'forehand', label: 'Forehand', color: '#38BDF8' },
+        { key: 'backhand', label: 'Backhand', color: '#0EA5E9' },
+        { key: 'slice', label: 'Slice', color: '#34D399' },
+        { key: 'volley', label: 'Volley', color: '#FBBF24' },
+        { key: 'drop', label: 'Drop', color: '#F472B6' },
+        { key: 'flat_serve', label: 'Flat serve', color: '#A78BFA' },
+        { key: 'topspin_serve', label: 'Topspin serve', color: '#FB7185' }
+      ];
+      var groups = [
+        {
+          label: 'Video (30HZ)',
+          charts: [
+            { label: 'Rafael Nadal', values: { forehand: 128.3, backhand: 109.3, slice: 29.4 } },
+            { label: 'Roger Federer', values: { forehand: 72.2, backhand: 78.2, slice: 28.6 } },
+            { label: 'Novak Djokovic', values: { forehand: 86.1, backhand: 89.6, slice: 13.3 } }
+          ]
+        },
+        {
+          label: 'MoCap (120HZ)',
+          charts: [
+            { label: 'Athlete 1', values: { forehand: 66.75, backhand: 56.75, slice: 34.5, volley: 15.55, drop: 20.55, flat_serve: 13.05, topspin_serve: 12.0 } },
+            { label: 'Athlete 2', values: { forehand: 65.1, backhand: 57.1, slice: 30.6, volley: 9.65, drop: 21.15, flat_serve: 8.8, topspin_serve: 8.2 } },
+            { label: 'Athlete 3', values: { forehand: 68.05, backhand: 64.95, slice: 39.35, volley: 14.8, drop: 25.4, flat_serve: 11.65, topspin_serve: 9.9 } }
+          ]
+        }
+      ];
+
+      function fmt(value) {
+        return Number(value).toLocaleString(undefined, {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1
+        });
+      }
+
+      function polar(cx, cy, radius, deg) {
+        var rad = (deg - 90) * Math.PI / 180;
+        return {
+          x: cx + radius * Math.cos(rad),
+          y: cy + radius * Math.sin(rad)
+        };
+      }
+
+      function donutPath(cx, cy, innerR, outerR, startDeg, endDeg) {
+        var large = endDeg - startDeg > 180 ? 1 : 0;
+        var p0 = polar(cx, cy, outerR, startDeg);
+        var p1 = polar(cx, cy, outerR, endDeg);
+        var p2 = polar(cx, cy, innerR, endDeg);
+        var p3 = polar(cx, cy, innerR, startDeg);
+        return [
+          'M', p0.x.toFixed(3), p0.y.toFixed(3),
+          'A', outerR, outerR, 0, large, 1, p1.x.toFixed(3), p1.y.toFixed(3),
+          'L', p2.x.toFixed(3), p2.y.toFixed(3),
+          'A', innerR, innerR, 0, large, 0, p3.x.toFixed(3), p3.y.toFixed(3),
+          'Z'
+        ].join(' ');
+      }
+
+      function renderChart(chart) {
+        var slices = strokes.map(function(stroke) {
+          return {
+            key: stroke.key,
+            label: stroke.label,
+            color: stroke.color,
+            value: Number(chart.values[stroke.key] || 0)
+          };
+        }).filter(function(slice) {
+          return slice.value > 0;
+        });
+        var total = slices.reduce(function(sum, slice) {
+          return sum + slice.value;
+        }, 0);
+        var cx = 60;
+        var cy = 60;
+        var outerR = 56;
+        var innerR = 34;
+        var angle = 0;
+        var gap = slices.length > 1 ? 0.9 : 0;
+        var paths = slices.map(function(slice) {
+          var sweep = total > 0 ? slice.value / total * 360 : 0;
+          var start = angle + gap / 2;
+          var end = angle + sweep - gap / 2;
+          angle += sweep;
+          if (end <= start) return '';
+          var percent = total > 0 ? (slice.value / total * 100).toFixed(1) : '0.0';
+          return '<path class="dataset-pie-slice" d="' + donutPath(cx, cy, innerR, outerR, start, end) + '" fill="' + slice.color + '">' +
+            '<title>' + slice.label + ': ' + fmt(slice.value) + ' min (' + percent + '%)</title>' +
+          '</path>';
+        }).join('');
+        var legend = slices.map(function(slice) {
+          return '<li class="dataset-pie-legend-item">' +
+            '<span class="dataset-pie-swatch" style="background:' + slice.color + '"></span>' +
+            '<span class="dataset-pie-legend-label">' + slice.label + '</span>' +
+            '<span class="dataset-pie-legend-value">' + fmt(slice.value) + '</span>' +
+          '</li>';
+        }).join('');
+
+        return '<article class="dataset-pie-card">' +
+          '<h4>' + chart.label + '</h4>' +
+          '<div class="dataset-pie-body">' +
+            '<div class="dataset-pie-visual" role="img" aria-label="' + chart.label + ' duration ' + fmt(total) + ' minutes">' +
+              '<svg viewBox="0 0 120 120" aria-hidden="true">' + paths + '</svg>' +
+              '<div class="dataset-pie-center"><strong>' + fmt(total) + '</strong><span>min</span></div>' +
+            '</div>' +
+            '<ul class="dataset-pie-legend">' + legend + '</ul>' +
+          '</div>' +
+        '</article>';
+      }
+
+      root.innerHTML = groups.map(function(group) {
+        return '<div class="dataset-pie-row">' +
+          '<div class="dataset-pie-row-label">' + group.label + '</div>' +
+          '<div class="dataset-pie-row-cards">' + group.charts.map(renderChart).join('') + '</div>' +
+        '</div>';
+      }).join('');
+    })();
+
+    (function() {
+      var colors = {
+        push_box: '#4f83cc',
+        carry_box: '#f2731f',
+        carry_ball: '#33a876',
+        punt_box: '#d95555',
+        kick_ball: '#8b63c7'
+      };
+      var labels = {
+        push_box: 'Push',
+        carry_box: 'Carry',
+        carry_ball: 'Relocate',
+        punt_box: 'Kick',
+        kick_ball: 'Slide'
+      };
+      var tsneState = {
+        points: [],
+        activeSkill: null,
+        lockedSkill: null
+      };
+
+      window.addEventListener('load', function() {
+        var canvas = document.getElementById('dataset-tsne');
+        if (!canvas) return;
+        fetch(csvUrl)
+          .then(function(response) {
+            if (!response.ok) throw new Error('Cannot load t-SNE CSV');
+            return response.text();
+          })
+          .then(function(text) {
+            var points = parseTsneCsv(text);
+            tsneState.points = points;
+            drawTsne(canvas, points, colors, tsneState.activeSkill);
+            renderTsneLabels(canvas, points, colors, labels);
+            renderTsneLegend(points, colors, labels);
+            var status = document.getElementById('tsne-status');
+            if (status) status.textContent = points.length.toLocaleString() + ' clips';
+            window.addEventListener('resize', function() {
+              drawTsne(canvas, points, colors, tsneState.activeSkill);
+              renderTsneLabels(canvas, points, colors, labels);
+            });
+          })
+          .catch(function(error) {
+            var status = document.getElementById('tsne-status');
+            if (status) status.textContent = 't-SNE unavailable';
+            console.warn(error);
+          });
+      });
+
+      function parseTsneCsv(text) {
+        var lines = text.trim().split(/\r?\n/);
+        var header = splitCsvLine(lines.shift());
+        var skillIndex = header.indexOf('skill');
+        var xIndex = header.indexOf('tsne_x');
+        var yIndex = header.indexOf('tsne_y');
+        var points = [];
+        for (var i = 0; i < lines.length; i += 1) {
+          var cols = splitCsvLine(lines[i]);
+          var x = Number(cols[xIndex]);
+          var y = Number(cols[yIndex]);
+          if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+          points.push({ x: x, y: y, skill: cols[skillIndex] || 'unknown' });
+        }
+        return points;
+      }
+
+      function splitCsvLine(line) {
+        var out = [];
+        var value = '';
+        var inQuotes = false;
+        for (var i = 0; i < line.length; i += 1) {
+          var ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              value += '"';
+              i += 1;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === ',' && !inQuotes) {
+            out.push(value);
+            value = '';
+          } else {
+            value += ch;
+          }
+        }
+        out.push(value);
+        return out;
+      }
+
+      function drawTsne(canvas, points, colorMap, activeSkill) {
+        var rect = canvas.getBoundingClientRect();
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var width = Math.max(320, Math.round(rect.width || canvas.width));
+        var height = Math.max(320, Math.round(rect.height || canvas.clientHeight || width * 14 / 23));
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+
+        var ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#08090c';
+        ctx.fillRect(0, 0, width, height);
+
+        var bounds = points.reduce(function(acc, point) {
+          acc.minX = Math.min(acc.minX, point.x);
+          acc.maxX = Math.max(acc.maxX, point.x);
+          acc.minY = Math.min(acc.minY, point.y);
+          acc.maxY = Math.max(acc.maxY, point.y);
+          return acc;
+        }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+        var pad = 34;
+        var scaleX = (width - pad * 2) / Math.max(1e-6, bounds.maxX - bounds.minX);
+        var scaleY = (height - pad * 2) / Math.max(1e-6, bounds.maxY - bounds.minY);
+
+        ctx.globalAlpha = 1;
+        points.forEach(function(point) {
+          var x = pad + (point.x - bounds.minX) * scaleX;
+          var y = height - pad - (point.y - bounds.minY) * scaleY;
+          ctx.fillStyle = colorMap[point.skill] || '#7c8ea3';
+          ctx.globalAlpha = activeSkill && point.skill !== activeSkill ? 0.08 : 0.62;
+          ctx.beginPath();
+          ctx.arc(x, y, activeSkill === point.skill ? 1.9 : 1.45, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      function renderTsneLegend(points, colorMap, labelMap) {
+        var legend = document.getElementById('tsne-legend');
+        if (!legend) return;
+        var counts = points.reduce(function(acc, point) {
+          acc[point.skill] = (acc[point.skill] || 0) + 1;
+          return acc;
+        }, {});
+        legend.innerHTML = Object.keys(counts).sort().map(function(skill) {
+          return '<button type="button" class="tsne-legend-item" data-tsne-skill="' + skill + '"><span class="tsne-legend-swatch" style="background:' +
+            (colorMap[skill] || '#7c8ea3') + '"></span>' +
+            (labelMap[skill] || skill) + ' (' + counts[skill].toLocaleString() + ')</button>';
+        }).join('');
+        legend.querySelectorAll('[data-tsne-skill]').forEach(function(button) {
+          bindTsneControl(button, button.getAttribute('data-tsne-skill'));
+        });
+      }
+
+      function renderTsneLabels(canvas, points, colorMap, labelMap) {
+        var layer = document.getElementById('tsne-label-layer');
+        if (!layer || points.length === 0) return;
+        var rect = canvas.getBoundingClientRect();
+        var width = rect.width || canvas.clientWidth || 920;
+        var height = rect.height || canvas.clientHeight || 560;
+        var pad = 34;
+        var bounds = points.reduce(function(acc, point) {
+          acc.minX = Math.min(acc.minX, point.x);
+          acc.maxX = Math.max(acc.maxX, point.x);
+          acc.minY = Math.min(acc.minY, point.y);
+          acc.maxY = Math.max(acc.maxY, point.y);
+          return acc;
+        }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+        var scaleX = (width - pad * 2) / Math.max(1e-6, bounds.maxX - bounds.minX);
+        var scaleY = (height - pad * 2) / Math.max(1e-6, bounds.maxY - bounds.minY);
+        var stats = points.reduce(function(acc, point) {
+          if (!acc[point.skill]) acc[point.skill] = { x: 0, y: 0, count: 0 };
+          acc[point.skill].x += point.x;
+          acc[point.skill].y += point.y;
+          acc[point.skill].count += 1;
+          return acc;
+        }, {});
+        layer.innerHTML = Object.keys(stats).sort().map(function(skill) {
+          var stat = stats[skill];
+          var cx = stat.x / stat.count;
+          var cy = stat.y / stat.count;
+          var left = pad + (cx - bounds.minX) * scaleX;
+          var top = height - pad - (cy - bounds.minY) * scaleY;
+          return '<button type="button" class="tsne-float-label" data-tsne-skill="' + skill + '" style="left:' +
+            left.toFixed(1) + 'px;top:' + top.toFixed(1) + 'px;--skill-color:' + (colorMap[skill] || '#7c8ea3') + '">' +
+            (labelMap[skill] || skill) + '<span>' + stat.count.toLocaleString() + '</span></button>';
+        }).join('');
+        layer.querySelectorAll('[data-tsne-skill]').forEach(function(button) {
+          bindTsneControl(button, button.getAttribute('data-tsne-skill'));
+        });
+        updateTsneActiveClasses();
+      }
+
+      function bindTsneControl(element, skill) {
+        element.addEventListener('mouseenter', function() {
+          if (!tsneState.lockedSkill) setTsneActiveSkill(skill);
+        });
+        element.addEventListener('mouseleave', function() {
+          if (!tsneState.lockedSkill) setTsneActiveSkill(null);
+        });
+        element.addEventListener('click', function() {
+          tsneState.lockedSkill = tsneState.lockedSkill === skill ? null : skill;
+          setTsneActiveSkill(tsneState.lockedSkill);
+        });
+      }
+
+      function setTsneActiveSkill(skill) {
+        tsneState.activeSkill = skill;
+        var canvas = document.getElementById('dataset-tsne');
+        if (canvas && tsneState.points.length) drawTsne(canvas, tsneState.points, colors, skill);
+        updateTsneActiveClasses();
+      }
+
+      function updateTsneActiveClasses() {
+        document.querySelectorAll('[data-tsne-skill]').forEach(function(element) {
+          var skill = element.getAttribute('data-tsne-skill');
+          element.classList.toggle('is-active', Boolean(tsneState.activeSkill && skill === tsneState.activeSkill));
+          element.classList.toggle('is-muted', Boolean(tsneState.activeSkill && skill !== tsneState.activeSkill));
+        });
+      }
+    })();
+
+    (function() {
+      var root = document.querySelector('[data-generalization-browser]');
+      if (!root) return;
+
+      var skillTabs = Array.prototype.slice.call(root.querySelectorAll('[data-generalization-skill]'));
+      var configTabs = Array.prototype.slice.call(root.querySelectorAll('[data-generalization-config]'));
+      var videoGrid = root.querySelector('[data-generalization-videos]');
+      var activeSkill = 'federer';
+      var activeConfig = 'g1';
+      var labels = {
+        nadal: 'Rafael Nadal',
+        federer: 'Roger Federer',
+        djokovic: 'Novak Djokovic',
+        first_class: 'First-Class Athlete',
+        g1: 'Unitree G1',
+        atom_p3: 'Atom P3'
+      };
+      var rallyRobots = {
+        g1: { label: 'Unitree G1' },
+        atom_p3: { label: 'Atom P3' }
+      };
+      var configDefinitions = {
+        nadal: rallyRobots,
+        federer: rallyRobots,
+        djokovic: rallyRobots,
+        first_class: rallyRobots
+      };
+      var layoutBySkill = {
+        nadal: 'gallery',
+        federer: 'gallery',
+        djokovic: 'gallery',
+        first_class: 'gallery'
+      };
+      var layoutByConfig = {
+        nadal: { atom_p3: 'gallery-2' },
+        federer: { atom_p3: 'gallery-2' },
+        djokovic: { atom_p3: 'gallery-2' },
+        first_class: { atom_p3: 'gallery-2' }
+      };
+      var configOrderBySkill = {};
+      var rallyDir = 'static/videos/adapt/rally/';
+      var clip = function(name, player, stroke, shot) {
+        return { src: rallyDir + name, player: player, stroke: stroke, shot: shot };
+      };
+      var videos = {
+        nadal: {
+          g1: [
+            clip('nadal_zs_texie.mp4', 'Rafael Nadal', 'Forehand', 'Close-up'),
+            clip('nadal_zs_jin.mp4', 'Rafael Nadal', 'Forehand', 'Medium'),
+            clip('nadal_zs_yuan.mp4', 'Rafael Nadal', 'Forehand', 'Full'),
+            clip('nadal_fs_texie.mp4', 'Rafael Nadal', 'Backhand', 'Close-up'),
+            clip('nadal_fs_jin.mp4', 'Rafael Nadal', 'Backhand', 'Medium'),
+            clip('nadal_fs_yuan.mp4', 'Rafael Nadal', 'Backhand', 'Full')
+          ],
+          atom_p3: [
+            clip('atom_nadal_zs_texie.mp4', 'Rafael Nadal', 'Forehand', 'Close-up'),
+            clip('atom_nadal_zs_jin.mp4', 'Rafael Nadal', 'Forehand', 'Medium'),
+            clip('atom_nadal_fs_texie.mp4', 'Rafael Nadal', 'Backhand', 'Close-up'),
+            clip('atom_nadal_fs_jin.mp4', 'Rafael Nadal', 'Backhand', 'Medium')
+          ]
+        },
+        federer: {
+          g1: [
+            clip('federer_zs_texie.mp4', 'Roger Federer', 'Forehand', 'Close-up'),
+            clip('federer_zs_jin.mp4', 'Roger Federer', 'Forehand', 'Medium'),
+            clip('federer_zs_yuan.mp4', 'Roger Federer', 'Forehand', 'Full'),
+            clip('federer_zs_fs_texie.mp4', 'Roger Federer', 'Fore & Backhand', 'Close-up'),
+            clip('federer_fs_jin2.mp4', 'Roger Federer', 'Backhand', 'Medium'),
+            clip('federer_fs_yuan.mp4', 'Roger Federer', 'Backhand', 'Full')
+          ],
+          atom_p3: [
+            clip('atom_federer_zs_jin.mp4', 'Roger Federer', 'Forehand', 'Medium'),
+            clip('atom_federer_zs_yuan.mp4', 'Roger Federer', 'Forehand', 'Full'),
+            clip('atom_federer_fs_jin.mp4', 'Roger Federer', 'Backhand', 'Medium'),
+            clip('atom_federer_fs_yuan.mp4', 'Roger Federer', 'Backhand', 'Full')
+          ]
+        },
+        djokovic: {
+          g1: [
+            clip('djo_zs_texie.mp4', 'Novak Djokovic', 'Forehand', 'Close-up'),
+            clip('djo_zs_jin.mp4', 'Novak Djokovic', 'Forehand', 'Medium'),
+            clip('djo_zs_yuan.mp4', 'Novak Djokovic', 'Forehand', 'Full')
+          ],
+          atom_p3: [
+            clip('atom_djo_zs_jin.mp4', 'Novak Djokovic', 'Forehand', 'Medium'),
+            clip('atom_djo_zs_yuan.mp4', 'Novak Djokovic', 'Forehand', 'Full')
+          ]
+        },
+        first_class: {
+          g1: [
+            clip('duan_zs_texie.mp4', 'Athlete', 'Forehand', 'Close-up'),
+            clip('duan_zs_jin.mp4', 'Athlete', 'Forehand', 'Medium'),
+            clip('duan_zs_yuan.mp4', 'Athlete', 'Forehand', 'Full'),
+            clip('duan_fs_texie.mp4', 'Athlete', 'Backhand', 'Close-up'),
+            clip('duan_fs_jin.mp4', 'Athlete', 'Backhand', 'Medium'),
+            clip('duan_fs_yuan.mp4', 'Athlete', 'Backhand', 'Full')
+          ],
+          atom_p3: [
+            clip('atom_duan_zs_jin.mp4', 'Athlete', 'Forehand', 'Medium'),
+            clip('atom_duan_zs_yuan.mp4', 'Athlete', 'Forehand', 'Full'),
+            clip('atom_duan_fs_texie.mp4', 'Athlete', 'Backhand', 'Close-up'),
+            clip('atom_duan_fs_jin.mp4', 'Athlete', 'Backhand', 'Medium')
+          ]
+        }
+      };
+
+      function setActive(tabs, activeTab) {
+        tabs.forEach(function(tab) {
+          var isActive = tab === activeTab;
+          tab.classList.toggle('is-active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function(char) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[char];
+        });
+      }
+
+      function normalizeClip(entry, index) {
+        if (!entry) return null;
+        if (typeof entry === 'string') return { src: entry, player: '', stroke: '', shot: '', label: '', index: index };
+        if (!entry.src) return null;
+        return {
+          src: entry.src,
+          player: entry.player || '',
+          stroke: entry.stroke || '',
+          shot: entry.shot || '',
+          label: entry.label || '',
+          index: index
+        };
+      }
+
+      function playerCaptionClass(player) {
+        var key = String(player || '').toLowerCase();
+        if (key.indexOf('nadal') !== -1) return 'nadal';
+        if (key.indexOf('federer') !== -1) return 'federer';
+        if (key.indexOf('djokovic') !== -1) return 'djokovic';
+        return 'athlete';
+      }
+
+      function buildCaption(clip) {
+        if (clip.player || clip.shot || clip.stroke) {
+          var playerKey = playerCaptionClass(clip.player);
+          return '<div class="rally-caption rally-caption--' + playerKey + '">' +
+            '<span class="rally-caption-player rally-caption-player--' + playerKey + '">' + escapeHtml(clip.player || 'AdaPT') + '</span>' +
+            '<span class="rally-caption-view">' +
+              (clip.stroke ? '<span class="rally-caption-stroke">' + escapeHtml(clip.stroke) + '</span>' : '') +
+              (clip.shot ? '<span class="rally-caption-shot">' + escapeHtml(clip.shot) + '</span>' : '') +
+            '</span>' +
+          '</div>';
+        }
+        if (clip.label) {
+          return '<div class="generalization-video-label">' + escapeHtml(clip.label) + '</div>';
+        }
+        return '';
+      }
+
+      function buildCard(item, extraClass) {
+        var clip = normalizeClip(item, 0) || { src: '', player: '', stroke: '', shot: '', label: '' };
+        var className = 'generalization-video-card' + (extraClass ? ' ' + extraClass : '');
+        return '<article class="' + className + '">' +
+          window.adaptLazyVideoTag(clip.src) +
+          buildCaption(clip) +
+          '</article>';
+      }
+
+      function bindLazyVideos() {
+        if (window.adaptLazyVideos) window.adaptLazyVideos.observe(videoGrid);
+      }
+
+      function buildEmptyCard(extraClass) {
+        var className = 'generalization-video-card generalization-video-card--empty' + (extraClass ? ' ' + extraClass : '');
+        return '<article class="' + className + '">' +
+          '<div class="generalization-video-slot"><strong>Preview unavailable</strong><span>The current configuration does not have a demo video yet.</span></div>' +
+          '</article>';
+      }
+
+      function getConfigDefinition(skill, config) {
+        var skillDefinitions = configDefinitions[skill] || configDefinitions.nadal || {};
+        return skillDefinitions[config] || null;
+      }
+
+      function findConfigTab(config) {
+        for (var i = 0; i < configTabs.length; i += 1) {
+          if (configTabs[i].getAttribute('data-generalization-config') === config) return configTabs[i];
+        }
+        return null;
+      }
+
+      function getFirstEnabledConfig(skill) {
+        var orderedConfigs = configOrderBySkill[skill] || configTabs.map(function(tab) {
+          return tab.getAttribute('data-generalization-config');
+        });
+        for (var i = 0; i < orderedConfigs.length; i += 1) {
+          var config = orderedConfigs[i];
+          var definition = getConfigDefinition(skill, config);
+          if (definition && !definition.disabled) return config;
+        }
+        return activeConfig;
+      }
+
+      function syncConfigTabs() {
+        var orderedConfigs = configOrderBySkill[activeSkill] || configTabs.map(function(tab) {
+          return tab.getAttribute('data-generalization-config');
+        });
+        configTabs.forEach(function(tab) {
+          var config = tab.getAttribute('data-generalization-config');
+          var definition = getConfigDefinition(activeSkill, config);
+          var isHidden = !definition;
+          var isDisabled = isHidden || definition.disabled === true;
+          var orderIndex = orderedConfigs.indexOf(config);
+          tab.hidden = isHidden;
+          tab.setAttribute('aria-hidden', isHidden ? 'true' : 'false');
+          tab.textContent = (definition && definition.label) || labels[config] || config;
+          tab.disabled = isDisabled;
+          tab.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+          tab.style.order = orderIndex === -1 ? String(configTabs.length) : String(orderIndex);
+        });
+
+        var activeDefinition = getConfigDefinition(activeSkill, activeConfig);
+        if (!activeDefinition || activeDefinition.disabled) {
+          activeConfig = getFirstEnabledConfig(activeSkill);
+        }
+
+        var activeTab = findConfigTab(activeConfig) || configTabs[0];
+        setActive(configTabs, activeTab);
+      }
+
+      function renderPairedVideos(sources) {
+        var pairItems = sources.slice(0, 2).map(function(entry, index) {
+          return normalizeClip(entry, index);
+        });
+
+        while (pairItems.length < 2) {
+          pairItems.push(null);
+        }
+
+        videoGrid.innerHTML =
+          '<div class="generalization-paired-layout">' +
+            pairItems.map(function(item) {
+              return item
+                ? buildCard(item, 'generalization-video-card--paired')
+                : buildEmptyCard('generalization-video-card--paired');
+            }).join('') +
+          '</div>';
+        bindLazyVideos();
+      }
+
+      function renderVideos() {
+        var skillVideos = videos[activeSkill] || {};
+        var sources = skillVideos[activeConfig] || [];
+        var availableItems = sources.reduce(function(items, entry, index) {
+          var clip = normalizeClip(entry, index);
+          if (clip) items.push(clip);
+          return items;
+        }, []);
+        var skillLayouts = layoutByConfig[activeSkill] || {};
+        var layout = skillLayouts[activeConfig] || layoutBySkill[activeSkill] || 'featured';
+
+        var isGallery = layout === 'gallery' || layout === 'gallery-2';
+        videoGrid.classList.toggle('generalization-video-grid--multi', layout === 'featured' || layout === 'featured-duo');
+        videoGrid.classList.toggle('generalization-video-grid--paired', layout === 'paired');
+        videoGrid.classList.toggle('generalization-video-grid--gallery', isGallery);
+        videoGrid.classList.toggle('generalization-video-grid--gallery-cols-2', layout === 'gallery-2');
+        videoGrid.className = videoGrid.className
+          .replace(/\bgeneralization-video-grid--gallery-count-\d+\b/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (layout === 'gallery') {
+          videoGrid.classList.add('generalization-video-grid--gallery-count-' + availableItems.length);
+        }
+
+        if (!availableItems.length) {
+          videoGrid.innerHTML = buildEmptyCard();
+          return;
+        }
+
+        if (isGallery) {
+          videoGrid.innerHTML = availableItems.map(function(item) {
+            return buildCard(item, 'generalization-video-card--gallery');
+          }).join('');
+          bindLazyVideos();
+          return;
+        }
+
+        if (layout === 'paired') {
+          renderPairedVideos(sources);
+          return;
+        }
+
+        var featuredItem = availableItems[0] || null;
+        var sideCount = layout === 'featured-duo' ? 2 : 3;
+        var sideItems = availableItems.slice(1, 1 + sideCount);
+        while (sideItems.length < sideCount) {
+          sideItems.push(null);
+        }
+
+        videoGrid.innerHTML =
+          '<div class="generalization-feature-layout">' +
+            '<div class="generalization-feature-main">' +
+              (featuredItem ? buildCard(featuredItem, 'generalization-video-card--featured') : buildEmptyCard('generalization-video-card--featured')) +
+            '</div>' +
+            '<div class="generalization-feature-rail">' +
+              sideItems.map(function(item) {
+                return item
+                  ? buildCard(item, 'generalization-video-card--compact')
+                  : buildEmptyCard('generalization-video-card--compact');
+              }).join('') +
+            '</div>' +
+          '</div>';
+        bindLazyVideos();
+      }
+
+      skillTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          if (tab.disabled || tab.getAttribute('aria-disabled') === 'true') return;
+          activeSkill = tab.getAttribute('data-generalization-skill');
+          setActive(skillTabs, tab);
+          syncConfigTabs();
+          renderVideos();
+        });
+      });
+      configTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          if (tab.disabled || tab.getAttribute('aria-disabled') === 'true') return;
+          activeConfig = tab.getAttribute('data-generalization-config');
+          setActive(configTabs, tab);
+          renderVideos();
+        });
+      });
+      syncConfigTabs();
+      renderVideos();
+    })();
+
+    (function() {
+      var root = document.querySelector('[data-chaining-browser]');
+      if (!root) return;
+
+      var taskTabs = Array.prototype.slice.call(root.querySelectorAll('[data-chaining-task]'));
+      var videoGrid = root.querySelector('[data-chaining-videos]');
+      var activeTask = 'mocap';
+      var videos = {
+        mocap: [
+          { src: 'static/videos/adapt/serve/mocap/duan_texie.mp4', label: 'Close-up' },
+          { src: 'static/videos/adapt/serve/mocap/duan_jin.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/mocap/duan_yuan.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/mocap/duan_vsplayer_full.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/mocap/federer_texie.mp4', label: 'Close-up' },
+          { src: 'static/videos/adapt/serve/mocap/federer_jin.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/mocap/federer_yuan.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/mocap/federer_vsplayer_full.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/mocap/duan_wild_jin.mp4', label: 'In the wild medium shot' },
+          { src: 'static/videos/adapt/serve/mocap/duan_wild_yuan.mp4', label: 'In the wild full shot' },
+          { src: 'static/videos/adapt/serve/mocap/federer_wild_jin.mp4', label: 'In the wild medium shot' },
+          { src: 'static/videos/adapt/serve/mocap/federer_wild_yuan.mp4', label: 'In the wild full shot' },
+        ],
+        video: [
+          { src: 'static/videos/adapt/serve/video/federer_dt.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/video/federer_dt_guang.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/video/deyue_dt.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/video/deyue_dt_guang.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/video/nadal_dtmimic.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/video/nbada_dtmimic_guang.mp4', label: 'Full shot' },
+          { src: 'static/videos/adapt/serve/video/djo_video_jin.mp4', label: 'Medium shot' },
+          { src: 'static/videos/adapt/serve/video/djo_video_yuan.mp4', label: 'Full shot' },
+        ]
+      };
+
+      function setActive(tabList, activeTab) {
+        tabList.forEach(function(tab) {
+          var isActive = tab === activeTab;
+          tab.classList.toggle('is-active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function(char) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[char];
+        });
+      }
+
+      function buildCard(item) {
+        var badgeHtml = item.badge
+          ? '<div class="recovery-video-badge"><span class="recovery-video-badge-label">Speed</span><strong>' + escapeHtml(item.badge) + '</strong></div>'
+          : '';
+        return '<article class="generalization-video-card recovery-video-card">' +
+          '<div class="recovery-video-media">' +
+          badgeHtml +
+          window.adaptLazyVideoTag(item.src) +
+          '</div>' +
+          '<div class="generalization-video-label">' + escapeHtml(item.label) + '</div>' +
+          '</article>';
+      }
+
+      function buildEmptyCard(label) {
+        return '<article class="generalization-video-card recovery-video-card generalization-video-card--empty">' +
+          '<div class="generalization-video-label">' + escapeHtml(label) + '</div>' +
+          '<div class="generalization-video-slot"><strong>Preview unavailable</strong><span>This serve video has not been linked yet.</span></div>' +
+          '</article>';
+      }
+
+      function renderVideos() {
+        var items = videos[activeTask] || [];
+        if (!items.length) {
+          videoGrid.innerHTML = buildEmptyCard('Serve video');
+          return;
+        }
+        videoGrid.innerHTML =
+          items.map(function(item) {
+            if (item && item.src) {
+              return buildCard(item);
+            }
+            return buildEmptyCard(item && item.label ? item.label : 'Serve video');
+          }).join('');
+        if (window.adaptLazyVideos) window.adaptLazyVideos.observe(videoGrid);
+      }
+
+      taskTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activeTask = tab.getAttribute('data-chaining-task');
+          setActive(taskTabs, tab);
+          renderVideos();
+        });
+      });
+
+      renderVideos();
+    })();
+
+    (function() {
+      var root = document.querySelector('[data-recovery-browser]');
+      if (!root) return;
+
+      var taskTabs = Array.prototype.slice.call(root.querySelectorAll('[data-recovery-task]'));
+      var videoGrid = root.querySelector('[data-recovery-videos]');
+      var activeTask = 'federer';
+      var videos = {
+        tennis_athlete: [
+          { src: 'static/videos/adapt/match/duan_duida_1.mp4', label: 'Rally 1' },
+          { src: 'static/videos/adapt/match/duan_duida_2.mp4', label: 'Rally 2' }
+        ],
+        federer: [
+          { src: 'static/videos/adapt/match/federer_duida_2.mp4', label: 'Rally 1' },
+          { src: 'static/videos/adapt/match/federer_duida.mp4', label: 'Rally 2' },
+          { src: 'static/videos/adapt/match/federer_fq_jieqiu.mp4', label: 'Serve & Rally' }
+        ]
+      };
+
+      function setActive(tabList, activeTab) {
+        tabList.forEach(function(tab) {
+          var isActive = tab === activeTab;
+          tab.classList.toggle('is-active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function(char) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[char];
+        });
+      }
+
+      function buildCard(item) {
+        var badgeHtml = item.badge
+          ? '<div class="recovery-video-badge"><span class="recovery-video-badge-label">Speed</span><strong>' + escapeHtml(item.badge) + '</strong></div>'
+          : '';
+        return '<article class="generalization-video-card recovery-video-card">' +
+          '<div class="recovery-video-media">' +
+          badgeHtml +
+          window.adaptLazyVideoTag(item.src) +
+          '</div>' +
+          '<div class="generalization-video-label">' + escapeHtml(item.label) + '</div>' +
+          '</article>';
+      }
+
+      function buildEmptyCard(label) {
+        return '<article class="generalization-video-card recovery-video-card generalization-video-card--empty">' +
+          '<div class="generalization-video-label">' + escapeHtml(label) + '</div>' +
+          '<div class="generalization-video-slot"><strong>Preview unavailable</strong><span>This human vs. robot video has not been linked yet.</span></div>' +
+          '</article>';
+      }
+
+      function renderVideos() {
+        var items = videos[activeTask] || [];
+        if (!items.length) {
+          videoGrid.innerHTML = buildEmptyCard('Human vs. robot video');
+          return;
+        }
+        videoGrid.className = 'recovery-video-grid recovery-video-grid--count-' + items.length;
+        videoGrid.innerHTML =
+          items.map(function(item) {
+            if (item && item.src) {
+              return buildCard(item);
+            }
+            return buildEmptyCard(item && item.label ? item.label : 'Human vs. robot video');
+          }).join('');
+        if (window.adaptLazyVideos) window.adaptLazyVideos.observe(videoGrid);
+      }
+
+      taskTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activeTask = tab.getAttribute('data-recovery-task');
+          setActive(taskTabs, tab);
+          renderVideos();
+        });
+      });
+
+      renderVideos();
+    })();
+
+    (function() {
+      var root = document.querySelector('[data-baseline-browser]');
+      if (!root) return;
+
+      var playerTabs = Array.prototype.slice.call(root.querySelectorAll('[data-baseline-player]'));
+      var taskTabs = Array.prototype.slice.call(root.querySelectorAll('[data-baseline-task]'));
+      var videoGrid = root.querySelector('[data-baseline-videos]');
+      var oursNote = root.querySelector('[data-baseline-note]');
+      var activePlayer = 'nadal';
+      var activeTask = 'stroke';
+      var labels = {
+        nadal: 'Rafael Nadal',
+        federer: 'Roger Federer',
+        djokovic: 'Novak Djokovic',
+        stroke: 'Stroke',
+        serve: 'Serve'
+      };
+      var methodLabels = {
+        ncp: 'NCP',
+        normal: 'Vid2Player3D',
+        dt: 'Ours',
+        notoss: 'w/o-TossRew',
+        nostage2: 'DeepMimic',
+        stage2: 'w/o-Planner',
+        dt_guang: 'DT wide'
+      };
+      var strokeSuccess = {
+        nadal: { dt: 70, ncp: 40, normal: 25 },
+        federer: { dt: 60, ncp: 30, normal: 20 },
+        djokovic: { dt: 75, ncp: 15, normal: 10 }
+      };
+      var serveSuccess = {
+        nadal: { dt: 66.7, nostage2: 80.0, stage2: 53.3, notoss: 60.0 },
+        federer: { dt: 73.3, nostage2: 53.3, stage2: 53.3, notoss: 73.3 },
+        djokovic: { dt: 86.7, nostage2: 60.0, stage2: 53.3, notoss: 80.0 }
+      };
+      var successByTask = {
+        stroke: strokeSuccess,
+        serve: serveSuccess
+      };
+      var methodOrder = {
+        stroke: ['dt', 'normal', 'ncp'],
+        serve: ['dt', 'stage2', 'nostage2', 'notoss', 'dt_guang']
+      };
+      var videos = {
+        nadal: {
+          stroke: {
+            dt: 'static/videos/adapt/baselines/rally/nadal_compare.mp4',
+            normal: 'static/videos/adapt/baselines/rally/nadal_normal_ce.mp4',
+            ncp: 'static/videos/adapt/baselines/rally/nadal_ncp_ce.mp4'
+          },
+          serve: {
+            dt: 'static/videos/adapt/baselines/serve/portrait/nadal_dt_compare.mp4',
+            stage2: 'static/videos/adapt/baselines/serve/portrait/nadal_stage2_compare.mp4',
+            nostage2: 'static/videos/adapt/baselines/serve/portrait/nadal_nostage2_compare.mp4',
+            notoss: 'static/videos/adapt/baselines/serve/portrait/nadal_notoss_compare.mp4'
+          }
+        },
+        federer: {
+          stroke: {
+            dt: 'static/videos/adapt/baselines/rally/federer_compare.mp4',
+            normal: 'static/videos/adapt/baselines/rally/federer_normal_ce.mp4',
+            ncp: 'static/videos/adapt/baselines/rally/federer_ncp_ce.mp4'
+          },
+          serve: {
+            dt: 'static/videos/adapt/baselines/serve/portrait/federer_dt_compare.mp4',
+            stage2: 'static/videos/adapt/baselines/serve/portrait/federer_stage2_compare.mp4',
+            nostage2: 'static/videos/adapt/baselines/serve/portrait/federer_nostage2_compare.mp4',
+            notoss: 'static/videos/adapt/baselines/serve/portrait/federer_notoss_compare.mp4'
+          }
+        },
+        djokovic: {
+          stroke: {
+            dt: 'static/videos/adapt/baselines/rally/djo_compare.mp4',
+            normal: 'static/videos/adapt/baselines/rally/deyue_normal_ce.mp4',
+            ncp: 'static/videos/adapt/baselines/rally/deyue_ncp_ce.mp4'
+          },
+          serve: {
+            dt: 'static/videos/adapt/baselines/serve/deyue_dt_ce.mp4',
+            stage2: 'static/videos/adapt/baselines/serve/deyue_stage2.mp4',
+            nostage2: 'static/videos/adapt/baselines/serve/deyue_nostage2.mp4',
+            notoss: 'static/videos/adapt/baselines/serve/deyue_notoss.mp4'
+          }
+        }
+      };
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function(char) {
+          return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[char];
+        });
+      }
+
+      function setActive(tabs, activeTab) {
+        tabs.forEach(function(tab) {
+          var isActive = tab === activeTab;
+          tab.classList.toggle('is-active', isActive);
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+      }
+
+      function renderVideos() {
+        var taskVideos = ((videos[activePlayer] || {})[activeTask]) || {};
+        var preferredOrder = methodOrder[activeTask] || [];
+        var methods = preferredOrder.filter(function(method) {
+          return Boolean(taskVideos[method]);
+        });
+        Object.keys(taskVideos).forEach(function(method) {
+          if (taskVideos[method] && methods.indexOf(method) === -1) methods.push(method);
+        });
+        videoGrid.className = 'generalization-video-grid baseline-video-grid baseline-video-grid--count-' + methods.length +
+          ((activeTask === 'serve' || activeTask === 'stroke') ? ' baseline-video-grid--portrait' : '');
+        if (!methods.length) {
+          videoGrid.innerHTML =
+            '<article class="generalization-video-card generalization-video-card--empty">' +
+              '<div class="generalization-video-slot"><strong>Preview unavailable</strong><span>This baseline comparison has not been linked yet.</span></div>' +
+            '</article>';
+          if (oursNote) oursNote.hidden = true;
+          return;
+        }
+        videoGrid.innerHTML = methods.map(function(method) {
+          var src = taskVideos[method];
+          var label = (methodLabels[method] || method);
+          var success = ((successByTask[activeTask] || {})[activePlayer] || {})[method];
+          var successHtml = Number.isFinite(success)
+            ? '<div class="stat-card baseline-success-card"><span>' + success + '%</span><p>Success</p></div>'
+            : '';
+          return '<article class="baseline-video-item">' +
+            '<div class="generalization-video-card baseline-video-card">' +
+            window.adaptLazyVideoTag(src) +
+            '<div class="generalization-video-label">' + escapeHtml(label) + '</div></div>' +
+            successHtml +
+          '</article>';
+        }).join('');
+        if (oursNote) oursNote.hidden = false;
+        if (window.adaptLazyVideos) window.adaptLazyVideos.observe(videoGrid);
+      }
+
+      playerTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activePlayer = tab.getAttribute('data-baseline-player');
+          setActive(playerTabs, tab);
+          renderVideos();
+        });
+      });
+      taskTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activeTask = tab.getAttribute('data-baseline-task');
+          setActive(taskTabs, tab);
+          renderVideos();
+        });
+      });
+      renderVideos();
+    })();
+
+    window.addEventListener('load', function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          return Promise.all(registrations.map(function(registration) {
+            return registration.unregister();
+          }));
+        }).catch(function(error) {
+          console.warn('Service worker cleanup skipped:', error);
+        });
+      }
+
+      if (window.caches) {
+        caches.keys().then(function(keys) {
+          return Promise.all(keys.map(function(key) {
+            return caches.delete(key);
+          }));
+        }).catch(function(error) {
+          console.warn('Cache cleanup skipped:', error);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

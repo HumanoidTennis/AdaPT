@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdaPT Dataset Motion Cloud</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f6f7f9;
+            color: #172033;
+            overflow: hidden;
+        }
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(246, 247, 249, 0.94);
+            z-index: 20;
+            font-weight: 800;
+        }
+        #top-panel,
+        #controls {
+            position: absolute;
+            z-index: 10;
+            border: 1px solid rgba(23, 32, 51, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            backdrop-filter: blur(10px);
+        }
+        #top-panel {
+            top: 16px;
+            left: 16px;
+            width: min(390px, calc(100vw - 32px));
+            padding: 14px 16px;
+        }
+        #top-panel h1 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+        #top-panel p {
+            margin: 0;
+            color: #586475;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        #counter {
+            margin-top: 9px;
+            color: #245cc7;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .mouse-guide {
+            display: grid;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .mouse-guide div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .mouse-guide span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            padding: 3px 7px;
+            border: 1px solid rgba(37, 99, 235, 0.22);
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.08);
+            color: #245cc7;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        #controls {
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            width: min(580px, calc(100vw - 36px));
+            padding: 12px 14px;
+            background: rgba(18, 25, 39, 0.88);
+        }
+        #timeline-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #timeline-slider {
+            flex: 1;
+            min-width: 0;
+            accent-color: #3b82f6;
+        }
+        #time-display {
+            width: 104px;
+            color: #e8edf5;
+            font: 700 12px/1.2 "Courier New", monospace;
+            text-align: right;
+        }
+        #button-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 9px;
+        }
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 7px 13px;
+            color: #f8fafc;
+            background: #2563eb;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button:hover { background: #1d4ed8; }
+        body.is-embed #top-panel {
+            top: 8px;
+            left: 8px;
+            width: min(260px, calc(100vw - 16px));
+            padding: 8px 10px;
+        }
+        body.is-embed #top-panel h1 { font-size: 14px; }
+        body.is-embed .mouse-guide { display: none; }
+        body.is-embed #counter { margin-top: 4px; }
+        body.is-embed #controls {
+            bottom: 8px;
+            width: min(520px, calc(100vw - 16px));
+            padding: 8px 10px;
+        }
+        body.is-embed #button-row { margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <div id="loading">Loading dataset motion cloud...</div>
+        <div id="top-panel">
+            <h1>Mouse Controls</h1>
+            <div class="mouse-guide" aria-label="Mouse interaction instructions">
+                <div><span>Wheel</span>Zoom in / out</div>
+                <div><span>Left click</span>Drag to rotate view</div>
+                <div><span>Right click</span>Drag to pan view</div>
+            </div>
+            <div id="counter">0 loaded</div>
+        </div>
+        <div id="controls">
+            <div id="timeline-row">
+                <input type="range" id="timeline-slider" min="0" max="1000" value="0" step="1">
+                <div id="time-display">0.00s / 0.00s</div>
+            </div>
+            <div id="button-row">
+                <button id="play-btn">Play</button>
+                <button id="pause-btn">Pause</button>
+                <button id="restart-btn">Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./static/vendor/three/build/three.module.js",
+            "three/addons/": "./static/vendor/three/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const pageParams = new URLSearchParams(window.location.search);
+        const requestedGroup = pageParams.get('group') || 'dataset_balanced';
+        const cacheToken = pageParams.get('v') || 'dataset-cloud-7x5-20260818';
+        const isEmbed = pageParams.get('embed') === '1';
+        const manifestUrl = `static/glb/manifest.json?v=${encodeURIComponent(cacheToken)}`;
+        const glbBaseUrl = 'static/glb/';
+        const spacing = 3.0;
+        const extraGap = 1.8;
+        const defaultColumns = 7;
+        const defaultRallyColumns = 5;
+        const propOrange = new THREE.Color(0xf2731f);
+
+        if (isEmbed) document.body.classList.add('is-embed');
+
+        const container = document.getElementById('canvas-container');
+        const loading = document.getElementById('loading');
+        const counter = document.getElementById('counter');
+        const timelineSlider = document.getElementById('timeline-slider');
+        const timeDisplay = document.getElementById('time-display');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf6f7f9);
+
+        const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.05, 500);
+        camera.position.set(2.4, 14, 22);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 0.8, 0);
+
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x8b929e, 0.92));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.32);
+        keyLight.position.set(8, 12, 5);
+        scene.add(keyLight);
+
+        const groundTexture = makeCheckerTexture();
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(1, 1),
+            new THREE.MeshStandardMaterial({ map: groundTexture, roughness: 0.86 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
+
+        const loader = new GLTFLoader();
+        const mixers = [];
+        const actions = [];
+        const clock = new THREE.Clock();
+        let duration = 0;
+        let playbackTime = 0;
+        let isPlaying = true;
+        let isScrubbing = false;
+
+        fetch(manifestUrl)
+            .then((response) => {
+                if (!response.ok) throw new Error(`Cannot load ${manifestUrl}`);
+                return response.json();
+            })
+            .then((manifest) => {
+                const datasetItems = groupItems(manifest, requestedGroup);
+                if (datasetItems.length === 0) throw new Error('Manifest has no dataset GLB items.');
+                counter.textContent = `0 / ${datasetItems.length} loaded`;
+                loading.textContent = `Loading dataset motion cloud... 0 / ${datasetItems.length}`;
+                return loadDatasetItems(datasetItems, manifest.layout || {});
+            })
+            .then(() => {
+                loading.style.display = 'none';
+                setAnimationTime(0);
+                updateTimeDisplay(0);
+                clock.getDelta();
+            })
+            .catch((error) => {
+                const message = error && error.message ? error.message : String(error);
+                loading.textContent = 'Failed to load dataset motion cloud: ' + message;
+                console.error(error);
+            });
+
+        timelineSlider.addEventListener('input', (event) => {
+            if (duration <= 0) return;
+            isScrubbing = true;
+            setAnimationTime((Number(event.target.value) / 1000) * duration);
+            renderer.render(scene, camera);
+        });
+        timelineSlider.addEventListener('change', () => {
+            isScrubbing = false;
+            clock.getDelta();
+        });
+        document.getElementById('play-btn').addEventListener('click', () => {
+            isPlaying = true;
+            clock.getDelta();
+        });
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            isPlaying = false;
+        });
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            setAnimationTime(0);
+            isPlaying = true;
+            clock.getDelta();
+        });
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        function groupItems(manifest, group) {
+            if (manifest.groups && Array.isArray(manifest.groups[group])) return manifest.groups[group];
+            return (manifest.items || []).filter((item) => (item.group || 'dataset') === group);
+        }
+
+        async function loadDatasetItems(items, layout) {
+            const columns = Number(layout.columns) || (items.length === 35 ? defaultColumns : Math.ceil(Math.sqrt(items.length)));
+            const rows = Number(layout.rows) || Math.ceil(items.length / columns);
+            const rallyColumns = Number(layout.rally_columns) || defaultRallyColumns;
+            const splitGap = items.length === 35 || layout.serve_columns ? extraGap : 0;
+            const gridWidth = Math.max(1, (columns - 1) * spacing + splitGap);
+            const gridDepth = Math.max(1, (rows - 1) * spacing);
+            const groundSize = Math.max(gridWidth, gridDepth) + spacing * 3.4;
+
+            ground.geometry.dispose();
+            ground.geometry = new THREE.PlaneGeometry(groundSize, groundSize);
+            groundTexture.repeat.set(Math.max(8, groundSize * 0.5), Math.max(8, groundSize * 0.5));
+            groundTexture.needsUpdate = true;
+
+            addRegionMarkers(columns, rows, rallyColumns, splitGap, gridDepth);
+            controls.target.set(0, 0.75, 0);
+            camera.position.set(gridWidth * 0.06, Math.max(11, groundSize * 0.42), Math.max(16, groundSize * 0.68));
+            camera.near = 0.05;
+            camera.far = 500;
+            camera.updateProjectionMatrix();
+
+            let loadedCount = 0;
+            let nextIndex = 0;
+            const concurrency = 3;
+
+            async function loadOne(index) {
+                const item = items[index];
+                const gltf = await loadGltf(`${glbBaseUrl}${item.file}?v=${encodeURIComponent(item.source || item.file)}`);
+                const model = gltf.scene;
+                const col = index % columns;
+                const row = Math.floor(index / columns);
+                const pos = cellPosition(col, row, columns, rows, rallyColumns, splitGap);
+                model.position.set(pos.x, 0, pos.z);
+                model.scale.setScalar(0.74);
+                model.traverse((child) => {
+                    if (!child.isMesh) return;
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                });
+                polishVisualizationColors(model);
+                scene.add(model);
+
+                if (gltf.animations.length > 0) {
+                    const mixer = new THREE.AnimationMixer(model);
+                    gltf.animations.forEach((clip) => {
+                        const action = mixer.clipAction(clip);
+                        action.play();
+                        actions.push(action);
+                    });
+                    // Force first-frame pose before heading normalization.
+                    mixer.update(0);
+                    normalizeModelHeading(model, item);
+                    mixers.push(mixer);
+                    duration = Math.max(duration, ...gltf.animations.map((clip) => clip.duration));
+                } else {
+                    normalizeModelHeading(model, item);
+                }
+                loadedCount += 1;
+                counter.textContent = `${loadedCount} / ${items.length} loaded`;
+                loading.textContent = `Loading dataset motion cloud... ${loadedCount} / ${items.length}`;
+            }
+
+            async function worker() {
+                while (nextIndex < items.length) {
+                    const index = nextIndex;
+                    nextIndex += 1;
+                    await loadOne(index);
+                }
+            }
+
+            await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, () => worker()));
+        }
+
+        function cellPosition(col, row, columns, rows, rallyColumns, splitGap) {
+            const shift = col >= rallyColumns ? splitGap / 2 : -splitGap / 2;
+            return {
+                x: (col - (columns - 1) / 2) * spacing + shift,
+                z: (row - (rows - 1) / 2) * spacing
+            };
+        }
+
+        function normalizeModelHeading(model, item) {
+            const facingNode = pickFacingNode(model);
+            if (!facingNode) return;
+            const forward = new THREE.Vector3(-1, 0, 0).applyQuaternion(facingNode.quaternion);
+            forward.y = 0;
+            if (forward.lengthSq() < 1e-8) return;
+            forward.normalize();
+
+            const toCamera = new THREE.Vector3().subVectors(camera.position, model.position);
+            toCamera.y = 0;
+            if (toCamera.lengthSq() < 1e-8) return;
+            toCamera.normalize();
+
+            const crossY = forward.x * toCamera.z - forward.z * toCamera.x;
+            const dot = THREE.MathUtils.clamp(forward.dot(toCamera), -1, 1);
+            const deltaYaw = Math.atan2(crossY, dot);
+            model.rotation.y += deltaYaw;
+
+            // Rally videos have opposite facing in source clips; flip horizontally.
+            const file = item && item.file ? String(item.file) : '';
+            if (file.startsWith('rally/g1_video_')) {
+                model.rotation.y += Math.PI;
+            }
+        }
+
+        function pickFacingNode(model) {
+            const prefer = /pelvis|waist|torso|hip|base/i;
+            let fallback = null;
+            let best = null;
+            model.traverse((obj) => {
+                if (!obj || !obj.isObject3D) return;
+                if (!fallback && obj !== model) fallback = obj;
+                if (!best && prefer.test(String(obj.name || ''))) best = obj;
+            });
+            return best || fallback;
+        }
+
+        function addRegionMarkers(columns, rows, rallyColumns, splitGap, gridDepth) {
+            if (!splitGap) return;
+            const rallyPos = cellPosition(rallyColumns - 1, 0, columns, rows, rallyColumns, splitGap);
+            const servePos = cellPosition(rallyColumns, 0, columns, rows, rallyColumns, splitGap);
+            const dividerX = (rallyPos.x + servePos.x) / 2;
+            const depth = gridDepth + spacing * 1.5;
+            const serveCenter = cellPosition(rallyColumns + (columns - rallyColumns - 1) / 2, 0, columns, rows, rallyColumns, splitGap);
+
+            const divider = new THREE.Mesh(
+                new THREE.BoxGeometry(0.07, 0.05, depth),
+                new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.45 })
+            );
+            divider.position.set(dividerX, 0.03, 0);
+            scene.add(divider);
+
+            const frontZ = ((rows - 1) / 2) * spacing + 1.45;
+            const rallyLabel = makeLabelSprite('RALLY', '#0ea5e9');
+            rallyLabel.position.set(cellPosition(2, 0, columns, rows, rallyColumns, splitGap).x, 0.08, frontZ);
+            scene.add(rallyLabel);
+            const serveLabel = makeLabelSprite('SERVE', '#0ea5e9');
+            serveLabel.position.set(serveCenter.x, 0.08, frontZ);
+            scene.add(serveLabel);
+        }
+
+        function makeLabelSprite(text, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.font = '800 64px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = color;
+            ctx.fillText(text, 256, 64);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+            sprite.scale.set(3.4, 0.85, 1);
+            return sprite;
+        }
+
+        function loadGltf(url) {
+            return new Promise((resolve, reject) => {
+                loader.load(url, resolve, undefined, reject);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (isPlaying && !isScrubbing && duration > 0) {
+                const delta = clock.getDelta();
+                mixers.forEach((mixer) => mixer.update(delta));
+                playbackTime = (playbackTime + delta) % duration;
+                timelineSlider.value = String((playbackTime / duration) * 1000);
+                updateTimeDisplay(playbackTime);
+            } else {
+                clock.getDelta();
+            }
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function setAnimationTime(time) {
+            playbackTime = duration > 0 ? Math.max(0, Math.min(time, duration)) : 0;
+            actions.forEach((action) => {
+                action.time = Math.min(playbackTime, action.getClip().duration);
+            });
+            mixers.forEach((mixer) => mixer.update(0));
+            timelineSlider.value = duration > 0 ? String((playbackTime / duration) * 1000) : '0';
+            updateTimeDisplay(playbackTime);
+        }
+
+        function updateTimeDisplay(currentTime) {
+            timeDisplay.textContent = `${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`;
+        }
+
+        function polishVisualizationColors(model) {
+            model.traverse((child) => {
+                if (!child.isMesh || (!isPropObject(child) && !isVisualOverlayObject(child))) return;
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                const polishedMaterials = materials.map((material) => {
+                    if (!material) return material;
+                    const clone = material.clone();
+                    if (clone.color) clone.color.copy(isPropObject(child) ? propOrange : pickPolishedColor(clone.color));
+                    if (clone.emissive && clone.color) {
+                        clone.emissive.copy(clone.color).multiplyScalar(isVisualOverlayObject(child) ? 0.38 : 0.22);
+                        clone.emissiveIntensity = isVisualOverlayObject(child) ? 0.9 : 0.65;
+                    }
+                    if (isVisualOverlayObject(child)) {
+                        clone.transparent = true;
+                        clone.opacity = 0.96;
+                    }
+                    if (isPropObject(child)) {
+                        clone.transparent = false;
+                        clone.opacity = 1.0;
+                        clone.depthWrite = true;
+                    }
+                    clone.metalness = 0.0;
+                    clone.needsUpdate = true;
+                    return clone;
+                });
+                child.material = Array.isArray(child.material) ? polishedMaterials : polishedMaterials[0];
+            });
+        }
+
+        function pickPolishedColor(color) {
+            if (!color) return new THREE.Color(0x7c8ea3);
+            const { r, g, b } = color;
+            if (r > 0.55 && g > 0.45 && b < 0.35) return new THREE.Color(0xe4bf3f);
+            if (g >= r && g >= b) return new THREE.Color(0x33b982);
+            if (b >= r && b >= g) return new THREE.Color(0x3f8fd8);
+            if (r >= g && r >= b) return new THREE.Color(0xf26a5b);
+            return new THREE.Color(0x7c8ea3);
+        }
+
+        function isBoxObject(object) {
+            const names = [
+                object.name || '',
+                object.parent?.name || '',
+                object.material?.name || '',
+                ...(Array.isArray(object.material) ? object.material.map((material) => material?.name || '') : [])
+            ].join(' ').toLowerCase();
+            return /(^|[_\s])box($|[_\s\d])/.test(names) || names.includes('carrybox') || names.includes('object_box');
+        }
+
+        function isBallObject(object) {
+            const names = [
+                object.name || '',
+                object.parent?.name || '',
+                object.material?.name || '',
+                ...(Array.isArray(object.material) ? object.material.map((material) => material?.name || '') : [])
+            ].join(' ').toLowerCase();
+            return names.includes('soccer') || names.includes('ball');
+        }
+
+        function isPropObject(object) {
+            return isBoxObject(object) || isBallObject(object);
+        }
+
+        function isVisualOverlayObject(object) {
+            const names = [
+                object.name || '',
+                object.parent?.name || '',
+                object.material?.name || '',
+                ...(Array.isArray(object.material) ? object.material.map((material) => material?.name || '') : [])
+            ].join(' ').toLowerCase();
+            return names.includes('visual_') || names.includes('seg_') || names.includes('trajectory') || names.includes('path');
+        }
+
+        function makeCheckerTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#f0f2f5';
+            ctx.fillRect(0, 0, 256, 256);
+            ctx.fillStyle = '#e3e7ed';
+            for (let y = 0; y < 8; y += 1) {
+                for (let x = 0; x < 8; x += 1) {
+                    if ((x + y) % 2 === 0) ctx.fillRect(x * 32, y * 32, 32, 32);
+                }
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(26, 18);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            return texture;
+        }
+    </script>
+</body>
+</html>
