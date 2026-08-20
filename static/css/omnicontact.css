@@ -603,7 +603,8 @@ html.is-file-protocol .dataset-glb-stage::after {
 
 .dataset-flip-front {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, auto);
+  overflow-y: auto;
 }
 
 .dataset-flip-back {
@@ -642,16 +643,16 @@ html.is-file-protocol .dataset-glb-stage::after {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
 }
 
 .dataset-pie-row {
   display: flex;
   flex-direction: column;
   gap: 0.42rem;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
 }
 
 .dataset-pie-row-label {
@@ -674,15 +675,14 @@ html.is-file-protocol .dataset-glb-stage::after {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.7rem;
-  flex: 1 1 auto;
-  min-height: 0;
+  align-items: start;
 }
 
 .dataset-pie-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100%;
+  height: auto;
   padding: 0.85rem 0.9rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
@@ -703,8 +703,8 @@ html.is-file-protocol .dataset-glb-stage::after {
   flex-direction: column;
   align-items: center;
   gap: 0.65rem;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
 }
 
 .dataset-pie-visual {
@@ -803,7 +803,11 @@ html.is-file-protocol .dataset-glb-stage::after {
 
 @media screen and (max-width: 1920px) {
   .dataset-pie-grid {
-    gap: 0.55rem;
+    gap: 1.15rem;
+  }
+
+  .dataset-pie-row {
+    gap: 0.5rem;
   }
 
   .dataset-pie-row-cards {
@@ -824,6 +828,10 @@ html.is-file-protocol .dataset-glb-stage::after {
     width: clamp(92px, 9.5vw, 156px);
   }
 
+  .dataset-pie-legend {
+    gap: 0.16rem;
+  }
+
   .dataset-pie-legend-label,
   .dataset-pie-legend-value {
     font-size: 0.64rem;
@@ -833,6 +841,15 @@ html.is-file-protocol .dataset-glb-stage::after {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
+  }
+
+  .dataset-flip-card {
+    height: clamp(820px, 84vh, 960px);
+    min-height: clamp(820px, 84vh, 960px);
+  }
+
+  .tsne-panel {
+    overflow-y: auto;
   }
 }
 
@@ -2385,8 +2402,8 @@ html.is-file-protocol .dataset-glb-stage::after {
   }
 
   .dataset-flip-card {
-    height: clamp(560px, 66vh, 720px);
-    min-height: clamp(560px, 66vh, 720px);
+    height: clamp(820px, 84vh, 960px);
+    min-height: clamp(820px, 84vh, 960px);
   }
 }
 
@@ -3405,8 +3422,8 @@ html.is-file-protocol .dataset-glb-stage::after {
   }
 
   .dataset-flip-card {
-    height: clamp(560px, 66vh, 720px);
-    min-height: clamp(560px, 66vh, 720px);
+    height: clamp(820px, 84vh, 960px);
+    min-height: clamp(820px, 84vh, 960px);
   }
 }
 
@@ -5335,8 +5352,8 @@ body {
 
 @media screen and (max-width: 1920px) {
   .dataset-flip-card {
-    height: clamp(560px, 66vh, 720px);
-    min-height: clamp(560px, 66vh, 720px);
+    height: clamp(820px, 84vh, 960px);
+    min-height: clamp(820px, 84vh, 960px);
   }
 }
 
