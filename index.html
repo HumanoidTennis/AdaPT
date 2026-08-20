@@ -201,7 +201,7 @@
               <div class="demo-desc hero-stagger hero-stagger--4">
                 <h2>We propose AdaPT, an Adaptive motion Planning and Tracking framework<br>that learns professional tennis serving and rally styles.</h2>
                 <p class="hero-highlights">
-                  Tennis Motions from video & Mocap · Rally on G1 & Atom P3 · In-the-wild serving
+                  Tennis Motions from Video & MoCap · Rally on G1 & Atom P3 · In-the-wild Serve
                 </p>
                 <!-- <p>We propose AdaPT, an Adaptive motion Planning and Tracking framework that learns professional tennis serving and rally styles.</p> -->
               </div>
@@ -266,8 +266,8 @@
             <div class="generalization-tabs generalization-tabs--skills" role="tablist" aria-label="Players">
               <button type="button" class="generalization-tab is-active" data-generalization-skill="federer" aria-selected="true">Roger Federer</button>
               <button type="button" class="generalization-tab" data-generalization-skill="nadal" aria-selected="false">Rafael Nadal</button>
-              <button type="button" class="generalization-tab" data-generalization-skill="first_class" aria-selected="false">Tennis Athletes</button>
               <button type="button" class="generalization-tab" data-generalization-skill="djokovic" aria-selected="false">Novak Djokovic</button>
+              <button type="button" class="generalization-tab" data-generalization-skill="first_class" aria-selected="false">Mr. Black (MoCap)</button>
             </div>
           </div>
           <div class="generalization-tab-row">
@@ -302,7 +302,7 @@
         <div class="recovery-browser reveal" data-recovery-browser>
           <div class="generalization-tabs recovery-tabs" role="tablist" aria-label="Human vs. robot demos">
             <button type="button" class="generalization-tab is-active" data-recovery-task="federer" aria-selected="true">Roger Federer</button>
-            <button type="button" class="generalization-tab" data-recovery-task="tennis_athlete" aria-selected="false">Tennis Athlete</button>
+            <button type="button" class="generalization-tab" data-recovery-task="tennis_athlete" aria-selected="false">Mr. Black (MoCap)</button>
           </div>
           <div class="recovery-video-grid" data-recovery-videos></div>
         </div>
@@ -1011,7 +1011,7 @@
         nadal: 'Rafael Nadal',
         federer: 'Roger Federer',
         djokovic: 'Novak Djokovic',
-        first_class: 'First-Class Athlete',
+        first_class: 'Mr. Black (MoCap)',
         g1: 'Unitree G1',
         atom_p3: 'Atom P3'
       };
@@ -1088,18 +1088,18 @@
         },
         first_class: {
           g1: [
-            clip('duan_zs_texie.mp4', 'Athlete', 'Forehand', 'Close-up'),
-            clip('duan_zs_jin.mp4', 'Athlete', 'Forehand', 'Medium'),
-            clip('duan_zs_yuan.mp4', 'Athlete', 'Forehand', 'Full'),
-            clip('duan_fs_texie.mp4', 'Athlete', 'Backhand', 'Close-up'),
-            clip('duan_fs_jin.mp4', 'Athlete', 'Backhand', 'Medium'),
-            clip('duan_fs_yuan.mp4', 'Athlete', 'Backhand', 'Full')
+            clip('duan_zs_texie.mp4', 'Mr. Black (MoCap)', 'Forehand', 'Close-up'),
+            clip('duan_zs_jin.mp4', 'Mr. Black (MoCap)', 'Forehand', 'Medium'),
+            clip('duan_zs_yuan.mp4', 'Mr. Black (MoCap)', 'Forehand', 'Full'),
+            clip('duan_fs_texie.mp4', 'Mr. Black (MoCap)', 'Backhand', 'Close-up'),
+            clip('duan_fs_jin.mp4', 'Mr. Black (MoCap)', 'Backhand', 'Medium'),
+            clip('duan_fs_yuan.mp4', 'Mr. Black (MoCap)', 'Backhand', 'Full')
           ],
           atom_p3: [
-            clip('atom_duan_zs_jin.mp4', 'Athlete', 'Forehand', 'Medium'),
-            clip('atom_duan_zs_yuan.mp4', 'Athlete', 'Forehand', 'Full'),
-            clip('atom_duan_fs_texie.mp4', 'Athlete', 'Backhand', 'Close-up'),
-            clip('atom_duan_fs_jin.mp4', 'Athlete', 'Backhand', 'Medium')
+            clip('atom_duan_zs_jin.mp4', 'Mr. Black (MoCap)', 'Forehand', 'Medium'),
+            clip('atom_duan_zs_yuan.mp4', 'Mr. Black (MoCap)', 'Forehand', 'Full'),
+            clip('atom_duan_fs_texie.mp4', 'Mr. Black (MoCap)', 'Backhand', 'Close-up'),
+            clip('atom_duan_fs_jin.mp4', 'Mr. Black (MoCap)', 'Backhand', 'Medium')
           ]
         }
       };
