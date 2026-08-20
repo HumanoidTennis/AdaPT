@@ -463,9 +463,10 @@
         if (source) {
           source.src = source.getAttribute('data-src');
           source.removeAttribute('data-src');
-          video.load();
         }
         video.muted = true;
+        video.preload = 'auto';
+        video.load();
         video.dataset.lazyActivated = '1';
       }
 
@@ -502,8 +503,8 @@
       }
 
       window.adaptLazyVideoTag = function(src) {
-        return '<video controls muted loop playsinline preload="none" data-lazy-video>' +
-          '<source data-src="' + escapeSrc(src) + '" type="video/mp4"></video>';
+        return '<video controls muted loop playsinline preload="auto" data-lazy-video>' +
+          '<source src="' + escapeSrc(src) + '" type="video/mp4"></video>';
       };
 
       window.adaptLazyVideos = {
@@ -511,6 +512,7 @@
           prune();
           var videos = (root || document).querySelectorAll('video[data-lazy-video]');
           if (!videos.length) return;
+          Array.prototype.forEach.call(videos, activate);
           if (!('IntersectionObserver' in window)) {
             Array.prototype.forEach.call(videos, playVideo);
             return;
@@ -519,6 +521,7 @@
           Array.prototype.forEach.call(videos, function(video) {
             observer.observe(video);
           });
+          syncPlayback();
         }
       };
     })();
