@@ -1400,8 +1400,8 @@ code {
 
 }
 
-/* Laptop Responsive (769px–1366px) */
-@media screen and (min-width: 769px) and (max-width: 1366px) {
+/* Laptop Responsive (769px–1920px) */
+@media screen and (min-width: 769px) and (max-width: 1920px) {
   .hero-body {
     padding: 3rem 2rem;
   }

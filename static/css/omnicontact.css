@@ -801,7 +801,7 @@ html.is-file-protocol .dataset-glb-stage::after {
   font-variant-numeric: tabular-nums;
 }
 
-@media screen and (max-width: 1366px) {
+@media screen and (max-width: 1920px) {
   .dataset-pie-row-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2316,7 +2316,7 @@ html.is-file-protocol .dataset-glb-stage::after {
   }
 }
 
-@media screen and (max-width: 1280px) {
+@media screen and (max-width: 1920px) {
   .baseline-video-grid--comparison {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3347,7 +3347,7 @@ html.is-file-protocol .dataset-glb-stage::after {
   line-height: 1.2;
 }
 
-@media screen and (max-width: 1366px) {
+@media screen and (max-width: 1920px) {
   .dataset-side {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5294,7 +5294,7 @@ body {
   }
 }
 
-@media screen and (max-width: 1366px) {
+@media screen and (max-width: 1920px) {
   .dataset-flip-card {
     height: clamp(560px, 66vh, 720px);
     min-height: clamp(560px, 66vh, 720px);
