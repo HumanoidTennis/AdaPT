@@ -802,22 +802,61 @@ html.is-file-protocol .dataset-glb-stage::after {
 }
 
 @media screen and (max-width: 1920px) {
+  .dataset-pie-grid {
+    gap: 0.55rem;
+  }
+
   .dataset-pie-row-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .dataset-pie-card {
+    padding: 0.65rem 0.5rem 0.55rem;
+  }
+
+  .dataset-pie-card h4 {
+    font-size: clamp(0.75rem, 0.9vw, 0.88rem);
+    margin-bottom: 0.45rem;
   }
 
   .dataset-pie-visual {
-    width: clamp(150px, 18vw, 200px);
+    width: clamp(92px, 9.5vw, 156px);
+  }
+
+  .dataset-pie-legend-label,
+  .dataset-pie-legend-value {
+    font-size: 0.64rem;
+  }
+
+  .dataset-pie-legend-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 640px) {
   .dataset-pie-row-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .dataset-pie-card {
+    padding: 0.45rem 0.35rem 0.4rem;
+  }
+
+  .dataset-pie-card h4 {
+    font-size: 0.68rem;
   }
 
   .dataset-pie-visual {
-    width: clamp(160px, 42vw, 220px);
+    width: clamp(72px, 22vw, 108px);
+  }
+
+  .dataset-pie-legend-label,
+  .dataset-pie-legend-value {
+    font-size: 0.55rem;
   }
 }
 
