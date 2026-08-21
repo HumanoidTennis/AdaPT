@@ -3402,21 +3402,29 @@ a:focus,
   pointer-events: none;
 }
 
-/* Section heading anchor links */
+/* Section heading anchor links (permalink; hidden until heading hover) */
 .heading-anchor {
   opacity: 0;
   color: var(--text-light);
   text-decoration: none;
   font-weight: 400;
-  font-size: 0.75em;
-  margin-left: 0.25em;
-  transition: opacity 0.15s ease;
-  vertical-align: middle;
+  font-size: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: baseline;
+  pointer-events: none;
+  transition: opacity 0.15s ease, font-size 0.15s ease, width 0.15s ease, margin 0.15s ease;
 }
 
 .section-heading:hover .heading-anchor,
-.heading-anchor:focus {
-  opacity: 0.5;
+.heading-anchor:focus-visible {
+  opacity: 0.55;
+  font-size: 0.75em;
+  width: auto;
+  margin-left: 0.25em;
+  pointer-events: auto;
 }
 
 .heading-anchor:hover {
